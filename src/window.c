@@ -238,6 +238,9 @@ GLFWAPI GLFWwindow* glfwCreateWindow(int width, int height,
     {
         if (wndconfig.centerCursor)
             _glfwCenterCursorInContentArea(window);
+        window->preeditCursorPosX = 0;
+        window->preeditCursorPosY = height;
+        window->preeditCursorHeight = 0;
     }
     else
     {
@@ -247,6 +250,9 @@ GLFWAPI GLFWwindow* glfwCreateWindow(int width, int height,
             if (wndconfig.focused)
                 _glfw.platform.focusWindow(window);
         }
+        window->preeditCursorPosX = 0;
+        window->preeditCursorPosY = height;
+        window->preeditCursorHeight = 0;
     }
 
     return (GLFWwindow*) window;
@@ -480,6 +486,11 @@ GLFWAPI void glfwDestroyWindow(GLFWwindow* handle)
         *prev = window->next;
     }
 
+    // Clear memory for preedit text
+    if (window->preeditText)
+        _glfw_free(window->preeditText);
+    if (window->preeditAttributeBlocks)
+        _glfw_free(window->preeditAttributeBlocks);
     _glfw_free(window);
 }
 

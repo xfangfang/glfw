@@ -332,14 +332,16 @@ void _glfwInputChar(_GLFWwindow* window, uint32_t codepoint, int mods, GLFWbool 
 
 void _glfwInputPreedit(_GLFWwindow* window, int focusedBlock)
 {
-    if (window->callbacks.preedit) {
+    if (window->callbacks.preedit)
+    {
         window->callbacks.preedit((GLFWwindow*) window, window->ntext, window->preeditText, window->nblocks, window->preeditAttributeBlocks, focusedBlock);
     }
 }
 
 void _glfwInputIMEStatus(_GLFWwindow* window)
 {
-    if (window->callbacks.imestatus) {
+    if (window->callbacks.imestatus)
+    {
         window->callbacks.imestatus((GLFWwindow*) window);
     }
 }
@@ -979,7 +981,8 @@ GLFWAPI void glfwSetPreeditCursorPos(GLFWwindow* handle, int x, int y, int h)
     window->preeditCursorHeight = h;
 }
 
-GLFWAPI void glfwResetPreeditText(GLFWwindow* handle) {
+GLFWAPI void glfwResetPreeditText(GLFWwindow* handle)
+{
     _GLFWwindow* window = (_GLFWwindow*) handle;
     _glfwPlatformResetPreeditText(window);
 }

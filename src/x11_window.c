@@ -552,13 +552,12 @@ static void enableCursor(_GLFWwindow* window)
     updateCursorImage(window);
 }
 
-// TODO This callback is replaced by _createXIMPreeditCallbacks. Is there a possibility that this clearing process is necessary?
 // Clear its handle when the input context has been destroyed
-// static void inputContextDestroyCallback(XIC ic, XPointer clientData, XPointer callData)
-// {
-//     _GLFWwindow* window = (_GLFWwindow*) clientData;
-//     window->x11.ic = NULL;
-// }
+static void inputContextDestroyCallback(XIC ic, XPointer clientData, XPointer callData)
+{
+    _GLFWwindow* window = (_GLFWwindow*) clientData;
+    window->x11.ic = NULL;
+}
 
 // Update cursor position to decide candidate window
 static void _ximChangeCursorPosition(XIC xic, _GLFWwindow* window)
@@ -2104,6 +2103,9 @@ void _glfwPushSelectionToManagerX11(void)
 
 void _glfwCreateInputContextX11(_GLFWwindow* window)
 {
+    XIMCallback callback;
+    callback.callback = (XIMProc) inputContextDestroyCallback;
+    callback.client_data = (XPointer) window;
     XVaNestedList preeditList = _createXIMPreeditCallbacks(window);
     XVaNestedList statusList = _createXIMStatusCallbacks(window);
 
@@ -2118,6 +2120,8 @@ void _glfwCreateInputContextX11(_GLFWwindow* window)
                                preeditList,
                                XNStatusAttributes,
                                statusList,
+                               XNDestroyCallback,
+                               &callback,
                                NULL);
 
     XFree(preeditList);

@@ -621,6 +621,8 @@ int main(int argc, char** argv)
             exit(EXIT_FAILURE);
         }
 
+        printf("IME name: %s\n", glfwGetIMEName(slots[i].window));
+
         glfwSetWindowUserPointer(slots[i].window, slots + i);
 
         glfwSetWindowPosCallback(slots[i].window, window_pos_callback);

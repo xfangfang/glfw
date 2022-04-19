@@ -644,6 +644,16 @@ GLFWAPI void glfwSetInputMode(GLFWwindow* handle, int mode, int value)
     _glfwInputError(GLFW_INVALID_ENUM, "Invalid input mode 0x%08X", mode);
 }
 
+GLFWAPI const char* glfwGetIMEName(GLFWwindow* handle)
+{
+    _GLFWwindow* window = (_GLFWwindow*) handle;
+    assert(window != NULL);
+
+    _GLFW_REQUIRE_INIT_OR_RETURN(0);
+
+    return _glfwPlatformGetIMEName(window);
+}
+
 GLFWAPI int glfwRawMouseMotionSupported(void)
 {
     _GLFW_REQUIRE_INIT_OR_RETURN(GLFW_FALSE);

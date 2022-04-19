@@ -35,7 +35,6 @@
 #include <windowsx.h>
 #include <shellapi.h>
 #include <imm.h>
-#include <winuser.h>
 
 // Returns the window style for the specified window
 //
@@ -2649,7 +2648,7 @@ const char* _glfwPlatformGetIMEName(_GLFWwindow* window)
     HWND hWnd = window->win32.handle;
     HIMC hIMC = ImmGetContext(hWnd);
     HKL hKL = GetKeyboardLayout(0);
-    UINT len = ImmGetDescriptionA(hKL, NULL, 0);
+    UINT len = ImmGetDescriptionW(hKL, NULL, 0);
 
     // Just for debug. We don't need this branch since `ImmGetDescription` returns zero when there is no IME.
     if (!ImmIsIME(hKL))
@@ -2665,15 +2664,15 @@ const char* _glfwPlatformGetIMEName(_GLFWwindow* window)
     }
     else
     {
-        LPSTR desc = _glfw_calloc(len, 1);
-        UINT ret = ImmGetDescriptionA(hKL, desc, len + 1);
+        LPWSTR desc = _glfw_calloc(len + 1, 1);
+        UINT ret = ImmGetDescriptionW(hKL, desc, len + 1);
         // Just for debug.
         if (!ret)
         {
             printf("Failed to get the description.\n");
         }
         ImmReleaseContext(hWnd, hIMC);
-        return desc;
+        return _glfwCreateUTF8FromWideStringWin32(desc);
     }
 }
 

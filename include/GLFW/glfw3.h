@@ -4640,6 +4640,8 @@ GLFWAPI int glfwGetInputMode(GLFWwindow* window, int mode);
  */
 GLFWAPI void glfwSetInputMode(GLFWwindow* window, int mode, int value);
 
+GLFWAPI const char* glfwPlatformGetIMEMode(GLFWwindow* window);
+
 /*! @brief Returns whether raw mouse motion is supported.
  *
  *  This function returns whether raw mouse motion is supported on the current

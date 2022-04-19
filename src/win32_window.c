@@ -2643,6 +2643,63 @@ int _glfwPlatformGetIMEStatus(_GLFWwindow* window)
     return result ? GLFW_TRUE : GLFW_FALSE;
 }
 
+const char* _glfwPlatformGetIMEMode(_GLFWwindow* window)
+{
+    HWND hWnd = window->win32.handle;
+    HIMC hIMC = ImmGetContext(hWnd);
+    DWORD conversion;
+    BOOL ret = ImmGetConversionStatus(hIMC, &conversion, NULL);
+    ImmReleaseContext(hWnd, hIMC);
+
+    if (!ret)
+    {
+        return "";
+    }
+
+    // https://docs.microsoft.com/en-us/windows/win32/intl/ime-conversion-mode-values
+    if (!(conversion & IME_CMODE_NATIVE))
+    {
+        if (conversion & IME_CMODE_FULLSHAPE)
+            return "AlphaNumeric-FullShape";
+        else
+            return "AlphaNumeric";
+    }
+    else if (conversion & IME_CMODE_ROMAN)
+    {
+        if (conversion & IME_CMODE_FULLSHAPE)
+        {
+            if (conversion & IME_CMODE_KATAKANA)
+                return "Roman-Katakana-FullShape";
+            else
+                // TODO Internationalization
+                return "Roman-Hiragana-FullShape";
+        }
+        else
+        {
+            if (conversion & IME_CMODE_KATAKANA)
+                return "Roman-Katakana-HalfShape";
+        }
+    }
+    else
+    {
+        if (conversion & IME_CMODE_FULLSHAPE)
+        {
+            if (conversion & IME_CMODE_KATAKANA)
+                return "Kana-Katakana-FullShape";
+            else
+                // TODO Internationalization
+                return "Kana-Hiragana-FullShape";
+        }
+        else
+        {
+            if (conversion & IME_CMODE_KATAKANA)
+                return "Kana-Katakana-HalfShape";
+        }
+    }
+
+    return "Unknown";
+}
+
 GLFWAPI HWND glfwGetWin32Window(GLFWwindow* handle)
 {
     _GLFWwindow* window = (_GLFWwindow*) handle;

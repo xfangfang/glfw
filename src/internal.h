@@ -956,6 +956,7 @@ void _glfwInputError(int code, const char* format, ...);
 void _glfwPlatformResetPreeditText(_GLFWwindow* window);
 void _glfwPlatformSetIMEStatus(_GLFWwindow* window, int active);
 int  _glfwPlatformGetIMEStatus(_GLFWwindow* window);
+const char* _glfwPlatformGetIMEMode(_GLFWwindow* window);
 
 //////////////////////////////////////////////////////////////////////////
 //////                       GLFW internal API                      //////

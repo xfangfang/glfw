@@ -532,6 +532,12 @@ static void joystick_callback(int jid, int event)
     }
 }
 
+static void ime_status_callback(GLFWwindow* window) {
+    Slot* slot = glfwGetWindowUserPointer(window);
+    printf("%08x to %i at %0.3f: IME switched. [mode: %s]\n",
+           counter++, slot->number, glfwGetTime(), glfwPlatformGetIMEMode(window));
+}
+
 int main(int argc, char** argv)
 {
     Slot* slots;
@@ -639,6 +645,7 @@ int main(int argc, char** argv)
         glfwSetKeyCallback(slots[i].window, key_callback);
         glfwSetCharCallback(slots[i].window, char_callback);
         glfwSetDropCallback(slots[i].window, drop_callback);
+        glfwSetIMEStatusCallback(slots[i].window, ime_status_callback);
 
         glfwMakeContextCurrent(slots[i].window);
         gladLoadGL(glfwGetProcAddress);

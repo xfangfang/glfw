@@ -1518,6 +1518,11 @@ static void processEvent(XEvent *event)
 
                     if (chars != buffer)
                         _glfw_free(chars);
+
+                    // In the case of over-the-spot, need to update the position here
+                    // because preedit-callbacks can not be used.
+                    if (_glfw.x11.imStyle == STYLE_OVERTHESPOT)
+                        _ximChangeCursorPosition(window->x11.ic, window);
                 }
             }
             else
@@ -2146,27 +2151,53 @@ void _glfwCreateInputContextX11(_GLFWwindow* window)
     XIMCallback callback;
     callback.callback = (XIMProc) inputContextDestroyCallback;
     callback.client_data = (XPointer) window;
-    XVaNestedList preeditList = _createXIMPreeditCallbacks(window);
-    XVaNestedList statusList = _createXIMStatusCallbacks(window);
 
-    window->x11.ic = XCreateIC(_glfw.x11.im,
-                               XNInputStyle,
-                               XIMPreeditCallbacks | XIMStatusCallbacks,
-                               XNClientWindow,
-                               window->x11.handle,
-                               XNFocusWindow,
-                               window->x11.handle,
-                               XNPreeditAttributes,
-                               preeditList,
-                               XNStatusAttributes,
-                               statusList,
-                               XNDestroyCallback,
-                               &callback,
-                               NULL);
-
-    XFree(preeditList);
-    XFree(statusList);
     window->x11.imeFocus = GLFW_FALSE;
+
+    if (_glfw.x11.imStyle == STYLE_ONTHESPOT)
+    {
+        XVaNestedList preeditList = _createXIMPreeditCallbacks(window);
+        XVaNestedList statusList = _createXIMStatusCallbacks(window);
+
+        window->x11.ic = XCreateIC(_glfw.x11.im,
+                                   XNInputStyle,
+                                   _glfw.x11.imStyle,
+                                   XNClientWindow,
+                                   window->x11.handle,
+                                   XNFocusWindow,
+                                   window->x11.handle,
+                                   XNPreeditAttributes,
+                                   preeditList,
+                                   XNStatusAttributes,
+                                   statusList,
+                                   XNDestroyCallback,
+                                   &callback,
+                                   NULL);
+
+        XFree(preeditList);
+        XFree(statusList);
+    }
+    else if (_glfw.x11.imStyle == STYLE_OVERTHESPOT)
+    {
+        window->x11.ic = XCreateIC(_glfw.x11.im,
+                                   XNInputStyle,
+                                   _glfw.x11.imStyle,
+                                   XNClientWindow,
+                                   window->x11.handle,
+                                   XNFocusWindow,
+                                   window->x11.handle,
+                                   XNDestroyCallback,
+                                   &callback,
+                                   NULL);
+    }
+    else
+    {
+        // (XIMPreeditNothing | XIMStatusNothing) is considered as STYLE_OVERTHESPOT.
+        // So this branch should not be used now.
+        _glfwInputError(GLFW_PLATFORM_ERROR,
+                        "X11: Failed to create input context.");
+        return;
+    }
 
     if (window->x11.ic)
     {
@@ -3521,6 +3552,10 @@ void _glfwPlatformResetPreeditText(_GLFWwindow* window)
     XVaNestedList preedit_attr;
     char* result;
 
+    // Can not manage IME in the case of over-the-spot.
+    if (_glfw.x11.imStyle == STYLE_OVERTHESPOT)
+        return;
+
     if (window->ntext == 0)
         return;
 
@@ -3544,6 +3579,11 @@ void _glfwPlatformResetPreeditText(_GLFWwindow* window)
 void _glfwPlatformSetIMEStatus(_GLFWwindow* window, int active)
 {
     XIC ic = window->x11.ic;
+
+    // Can not manage IME in the case of over-the-spot.
+    if (_glfw.x11.imStyle == STYLE_OVERTHESPOT)
+        return;
+
     if (active)
         XSetICFocus(ic);
     else
@@ -3552,6 +3592,10 @@ void _glfwPlatformSetIMEStatus(_GLFWwindow* window, int active)
 
 int  _glfwPlatformGetIMEStatus(_GLFWwindow* window)
 {
+    // Can not manage IME in the case of over-the-spot.
+    if (_glfw.x11.imStyle == STYLE_OVERTHESPOT)
+        return GLFW_FALSE;
+
     return window->x11.imeFocus;
 }
 

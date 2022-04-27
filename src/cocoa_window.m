@@ -735,6 +735,9 @@ static const NSRange kEmptyRange = { NSNotFound, 0 };
 - (void)unmarkText
 {
     [[markedText mutableString] setString:@""];
+    window->nblocks = 0;
+    window->ntext = 0;
+    _glfwInputPreedit(window, 0);
 }
 
 - (NSArray*)validAttributesForMarkedText
@@ -800,6 +803,8 @@ static const NSRange kEmptyRange = { NSNotFound, 0 };
             _glfwInputChar(window, codepoint, mods, plain);
         }
     }
+
+    [self unmarkText];
 }
 
 - (void)doCommandBySelector:(SEL)selector
@@ -2105,7 +2110,7 @@ VkResult _glfwCreateWindowSurfaceCocoa(VkInstance instance,
 
 void _glfwPlatformResetPreeditText(_GLFWwindow* window)
 {
-    NSTextInputContext *context = [NSTextInputContext currentInputContext];
+    NSTextInputContext* context = [NSTextInputContext currentInputContext];
     [context discardMarkedText];
     [window->ns.view unmarkText];
 }

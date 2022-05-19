@@ -1915,7 +1915,12 @@ typedef void (* GLFWcharmodsfun)(GLFWwindow* window, unsigned int codepoint, int
  *
  *  @ingroup input
  */
-typedef void (* GLFWpreeditfun)(GLFWwindow*,int,unsigned int*,int,int*,int);
+typedef void (* GLFWpreeditfun)(GLFWwindow* window,
+                                int preedit_length,
+                                unsigned int* preedit_string,
+                                int block_count,
+                                int* block_sizes_list,
+                                int focused_block);
 
 /*! @brief The function pointer type for IME status change callbacks.
  *
@@ -1928,7 +1933,7 @@ typedef void (* GLFWpreeditfun)(GLFWwindow*,int,unsigned int*,int,int*,int);
  *
  *  @ingroup monitor
  */
-typedef void (* GLFWimestatusfun)(GLFWwindow*);
+typedef void (* GLFWimestatusfun)(GLFWwindow* window);
 
 /*! @brief The function pointer type for path drop callbacks.
  *

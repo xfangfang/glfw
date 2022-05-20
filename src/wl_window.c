@@ -2772,6 +2772,10 @@ const char* _glfwGetClipboardStringWayland(void)
     return _glfw.wl.clipboardString;
 }
 
+void _glfwUpdatePreeditCursorPosWayland(_GLFWwindow* window)
+{
+}
+
 void _glfwResetPreeditTextWayland(_GLFWwindow* window)
 {
 }

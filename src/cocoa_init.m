@@ -508,6 +508,7 @@ GLFWbool _glfwConnectCocoa(int platformID, _GLFWplatform* platform)
         _glfwGetKeyScancodeCocoa,
         _glfwSetClipboardStringCocoa,
         _glfwGetClipboardStringCocoa,
+        _glfwUpdatePreeditCursorPosCocoa,
         _glfwResetPreeditTextCocoa,
         _glfwSetIMEStatusCocoa,
         _glfwGetIMEStatusCocoa,

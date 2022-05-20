@@ -1840,6 +1840,12 @@ const char* _glfwGetClipboardStringCocoa(void)
     } // autoreleasepool
 }
 
+void _glfwUpdatePreeditCursorPosCocoa(_GLFWwindow* window)
+{
+    // Do nothing. Instead, implement `firstRectForCharacterRange` callback
+    // to update the position.
+}
+
 void _glfwResetPreeditTextCocoa(_GLFWwindow* window)
 {
     NSTextInputContext* context = [NSTextInputContext currentInputContext];

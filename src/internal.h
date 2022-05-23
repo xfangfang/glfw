@@ -378,6 +378,7 @@ struct _GLFWinitconfig
     } ns;
     struct {
         GLFWbool  xcbVulkanSurface;
+        GLFWbool  onTheSpotIMStyle;
     } x11;
 };
 

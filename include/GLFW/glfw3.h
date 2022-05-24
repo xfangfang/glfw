@@ -5292,7 +5292,7 @@ GLFWAPI GLFWcharmodsfun glfwSetCharModsCallback(GLFWwindow* window, GLFWcharmods
  *  callback.
  *  @return The previously set callback, or `NULL` if no callback was set or an
  *  error occurred.
- * 
+ *
  *  @callback_signature
  *  @code
  *  void function_name(GLFWwindow* window,
@@ -5326,7 +5326,7 @@ GLFWAPI GLFWpreeditfun glfwSetPreeditCallback(GLFWwindow* window, GLFWpreeditfun
  *  callback.
  *  @return The previously set callback, or `NULL` if no callback was set or an
  *  error occurred.
- * 
+ *
  *  @callback_signature
  *  @code
  *  void function_name(GLFWwindow* window)

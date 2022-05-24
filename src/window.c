@@ -215,6 +215,10 @@ GLFWAPI GLFWwindow* glfwCreateWindow(int width, int height,
     window->numer       = GLFW_DONT_CARE;
     window->denom       = GLFW_DONT_CARE;
 
+    window->preeditCursorPosX = 0;
+    window->preeditCursorPosY = height;
+    window->preeditCursorHeight = 0;
+
     // Open the actual window and create its context
     if (!_glfw.platform.createWindow(window, &wndconfig, &ctxconfig, &fbconfig))
     {
@@ -238,9 +242,6 @@ GLFWAPI GLFWwindow* glfwCreateWindow(int width, int height,
     {
         if (wndconfig.centerCursor)
             _glfwCenterCursorInContentArea(window);
-        window->preeditCursorPosX = 0;
-        window->preeditCursorPosY = height;
-        window->preeditCursorHeight = 0;
     }
     else
     {
@@ -250,9 +251,6 @@ GLFWAPI GLFWwindow* glfwCreateWindow(int width, int height,
             if (wndconfig.focused)
                 _glfw.platform.focusWindow(window);
         }
-        window->preeditCursorPosX = 0;
-        window->preeditCursorPosY = height;
-        window->preeditCursorHeight = 0;
     }
 
     return (GLFWwindow*) window;

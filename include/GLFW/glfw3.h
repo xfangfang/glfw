@@ -5133,6 +5133,9 @@ GLFWAPI void glfwSetPreeditCursorPos(GLFWwindow* window, int x, int y, int h);
  *
  *  @param[in] window The window.
  *
+ *  @remark @x11 Since over-the-spot style is used by default, you don't need
+ *  to use this function.
+ *
  *  @par Thread Safety
  *  This function may only be called from the main thread.
  *
@@ -5306,6 +5309,9 @@ GLFWAPI GLFWcharmodsfun glfwSetCharModsCallback(GLFWwindow* window, GLFWcharmods
  *  For more information about the callback parameters, see the
  *  [function pointer type](@ref GLFWpreeditfun).
  *
+ *  @remark @x11 Since over-the-spot style is used by default, you don't need
+ *  to use this function.
+ *
  *  @par Thread Safety
  *  This function may only be called from the main thread.
  *
@@ -5334,6 +5340,8 @@ GLFWAPI GLFWpreeditfun glfwSetPreeditCallback(GLFWwindow* window, GLFWpreeditfun
  *  @endcode
  *  For more information about the callback parameters, see the
  *  [function pointer type](@ref GLFWimestatusfun).
+ *
+ *  @remark @x11 Don't support this function.  The callback is not called.
  *
  *  @par Thread Safety
  *  This function may only be called from the main thread.

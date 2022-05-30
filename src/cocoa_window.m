@@ -749,7 +749,8 @@ static const NSRange kEmptyRange = { NSNotFound, 0 };
             focusedBlock = window->nblocks;
         window->nblocks++;
     }
-    _glfwInputPreedit(window, focusedBlock);
+    // The caret is always at the last of preedit in macOS.
+    _glfwInputPreedit(window, focusedBlock, window->ntext);
 }
 
 - (void)unmarkText
@@ -757,7 +758,7 @@ static const NSRange kEmptyRange = { NSNotFound, 0 };
     [[markedText mutableString] setString:@""];
     window->nblocks = 0;
     window->ntext = 0;
-    _glfwInputPreedit(window, 0);
+    _glfwInputPreedit(window, 0, 0);
 }
 
 - (NSArray*)validAttributesForMarkedText

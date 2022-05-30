@@ -593,7 +593,7 @@ static void _ximPreeditDrawCallback(XIC xic, XPointer clientData, XIMPreeditDraw
         // preedit text is empty
         window->ntext = 0;
         window->nblocks = 0;
-        _glfwInputPreedit(window, 0);
+        _glfwInputPreedit(window, 0, 0);
         return;
     }
     else
@@ -653,7 +653,7 @@ static void _ximPreeditDrawCallback(XIC xic, XPointer clientData, XIMPreeditDraw
             window->nblocks = 1;
             window->preeditAttributeBlocks[0] = length;
             window->preeditAttributeBlocks[1] = 0;
-            _glfwInputPreedit(window, 0);
+            _glfwInputPreedit(window, 0, callData->caret);
         }
         else if (rstart == 0)
         {
@@ -662,7 +662,7 @@ static void _ximPreeditDrawCallback(XIC xic, XPointer clientData, XIMPreeditDraw
                 window->nblocks = 1;
                 window->preeditAttributeBlocks[0] = length;
                 window->preeditAttributeBlocks[1] = 0;
-                _glfwInputPreedit(window, 0);
+                _glfwInputPreedit(window, 0, callData->caret);
             }
             else
             {
@@ -670,7 +670,7 @@ static void _ximPreeditDrawCallback(XIC xic, XPointer clientData, XIMPreeditDraw
                 window->preeditAttributeBlocks[0] = rend + 1;
                 window->preeditAttributeBlocks[1] = length - rend - 1;
                 window->preeditAttributeBlocks[2] = 0;
-                _glfwInputPreedit(window, 0);
+                _glfwInputPreedit(window, 0, callData->caret);
             }
         }
         else if (rend == length - 1)
@@ -679,7 +679,7 @@ static void _ximPreeditDrawCallback(XIC xic, XPointer clientData, XIMPreeditDraw
             window->preeditAttributeBlocks[0] = rstart;
             window->preeditAttributeBlocks[1] = length - rstart;
             window->preeditAttributeBlocks[2] = 0;
-            _glfwInputPreedit(window, 1);
+            _glfwInputPreedit(window, 1, callData->caret);
         }
         else
         {
@@ -688,7 +688,7 @@ static void _ximPreeditDrawCallback(XIC xic, XPointer clientData, XIMPreeditDraw
             window->preeditAttributeBlocks[1] = rend - rstart + 1;
             window->preeditAttributeBlocks[2] = length - rend - 1;
             window->preeditAttributeBlocks[3] = 0;
-            _glfwInputPreedit(window, 1);
+            _glfwInputPreedit(window, 1, callData->caret);
         }
     }
 }
@@ -3384,7 +3384,7 @@ void _glfwResetPreeditTextX11(_GLFWwindow* window)
 
     window->ntext = 0;
     window->nblocks = 0;
-    _glfwInputPreedit(window, 0);
+    _glfwInputPreedit(window, 0, 0);
 
     XFree (result);
 }

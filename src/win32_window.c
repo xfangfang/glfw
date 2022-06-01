@@ -975,9 +975,6 @@ static LRESULT CALLBACK windowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
         {
             if (lParam & GCS_RESULTSTR)
             {
-                window->nblocks = 0;
-                window->ntext = 0;
-                _glfwInputPreedit(window, 0, 0);
                 commitImmResultStr(window);
                 return TRUE;
             }
@@ -990,6 +987,11 @@ static LRESULT CALLBACK windowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
             }
             break;
         }
+        case WM_IME_ENDCOMPOSITION:
+            window->nblocks = 0;
+            window->ntext = 0;
+            _glfwInputPreedit(window, 0, 0);
+            return TRUE;
         case WM_IME_NOTIFY:
             if (wParam == IMN_SETOPENSTATUS)
                 _glfwInputIMEStatus(window);

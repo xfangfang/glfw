@@ -79,15 +79,16 @@
 #define MAX_BUFFER_LEN 1024
 
 // https://github.com/Immediate-Mode-UI/Nuklear/wiki/Complete-font-guide
+// https://unicode-table.com
 // To handle other languages, you need to fix these ranges.
 static nk_rune rangesJapan[] = {
-    0x0020, 0x007E,
-    0x3001, 0x3003,     /* 、。〃 */
-    0x3005, 0x301F,     /* 々〆〇 and brackets */
-    0x3036, 0x3036,     /* 〶 */
-    0x3041, 0x309F,     /* Hiragana */
-    0x30A0, 0x30FF,     /* Katakana */
-    0x4E00, 0x9FFF,    /* All Kanji */
+    0x0020, 0x007E, // Basic Latin
+    0x2000, 0x206F, // General Punctuation
+    0x3000, 0x303F, // CJK Symbols and Punctuation
+    0x3041, 0x309F, // Hiragana
+    0x30A0, 0x30FF, // Katakana
+    0x4E00, 0x9FFF, // All Kanji
+    0xFF01, 0xFFEF, // Halfwidth and Fullwidth Forms
     0
 };
 

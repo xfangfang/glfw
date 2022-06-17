@@ -139,6 +139,8 @@ static size_t encode_utf8(char* s, unsigned int ch)
         s[count++] = (ch & 0x3f) | 0x80;
     }
 
+    s[count] = '\0';
+
     return count;
 }
 

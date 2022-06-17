@@ -580,7 +580,6 @@ static GLFWbool getImmPreedit(_GLFWwindow* window)
         int cblocks = window->cblocks;
         int focusedBlock = 0;
         int length = preeditBytes / sizeof(WCHAR);
-        int convertedLength = 0;
         LPWSTR buffer = _glfw_calloc(preeditBytes, 1);
         LPSTR attributes = _glfw_calloc(attrBytes, 1);
         DWORD *clauses = _glfw_calloc(clauseBytes, 1);
@@ -611,21 +610,8 @@ static GLFWbool getImmPreedit(_GLFWwindow* window)
             window->ctext = ctext;
         }
 
-        for (i = 0; i < length; i++)
-        {
-            if (convertToUTF32FromUTF16(buffer[i],
-                                        &highSurrogate,
-                                        &codepoint))
-                window->preeditText[convertedLength++] = codepoint;
-        }
-        window->ntext = convertedLength;
-        window->preeditText[convertedLength] = 0;
-
         // store blocks
         window->nblocks = clauseBytes / sizeof(DWORD) - 1;
-        // last element of clauses is a block count, but
-        // text length is convenient.
-        clauses[window->nblocks] = length;
         while (cblocks < window->nblocks)
             cblocks = (cblocks == 0) ? 1 : cblocks * 2;
         if (cblocks != window->cblocks)
@@ -645,11 +631,51 @@ static GLFWbool getImmPreedit(_GLFWwindow* window)
             window->preeditAttributeBlocks = blocks;
             window->cblocks = cblocks;
         }
+
         for (i = 0; i < window->nblocks; i++)
         {
-            window->preeditAttributeBlocks[i] = clauses[i + 1] - clauses[i];
             if (attributes[clauses[i]] != ATTR_CONVERTED)
+            {
                 focusedBlock = i;
+                break;
+            }
+        }
+
+        {
+            // Win32 API handles text data in UTF16, so we have to convert them
+            // to UTF32. Not only the encoding, but also the number of characters,
+            // the position of each block and the cursor.
+            int convertedLength = 0;
+            int blockIndex = 0;
+            int currentBlockLength = 0;
+            // The last element of clauses is a block count, but
+            // text length is convenient.
+            clauses[window->nblocks] = length;
+            for (i = 0; i < length; i++)
+            {
+                if (clauses[blockIndex + 1] <= (DWORD) i)
+                {
+                    window->preeditAttributeBlocks[blockIndex++] = currentBlockLength;
+                    currentBlockLength = 0;
+                }
+
+                if (convertToUTF32FromUTF16(buffer[i],
+                                            &highSurrogate,
+                                            &codepoint))
+                {
+                    window->preeditText[convertedLength++] = codepoint;
+                    currentBlockLength++;
+                }
+                else if ((LONG) i < cursorPos)
+                {
+                    // A high surrogate appears before cursorPos, so needs to
+                    // fix cursorPos on UTF16 for UTF32
+                    cursorPos--;
+                }
+            }
+            window->preeditAttributeBlocks[blockIndex] = currentBlockLength;
+            window->ntext = convertedLength;
+            window->preeditText[convertedLength] = 0;
         }
 
         _glfw_free(buffer);

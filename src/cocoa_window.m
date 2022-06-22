@@ -712,11 +712,41 @@ static const NSRange kEmptyRange = { NSNotFound, 0 };
         window->ctext = ctext;
     }
 
+    // NSString handles text data in UTF16 by default, so we have to convert them
+    // to UTF32. Not only the encoding, but also the number of characters and
+    // the position of each block.
+    int currentBlockIndex = 0;
+    int currentBlockLength = 0;
+    int currentBlockLocation = 0;
+    int focusedBlock = 0;
     NSInteger preeditTextLength = 0;
     NSRange range = NSMakeRange(0, length);
     while (range.length)
     {
         uint32_t codepoint = 0;
+        NSRange currentBlockRange;
+        [markedText attributesAtIndex:range.location
+                       effectiveRange:&currentBlockRange];
+
+        if (window->cblocks < 1 + currentBlockIndex)
+        {
+            int cblocks = (window->cblocks == 0) ? 1 : window->cblocks * 2;
+            int* blocks = realloc(window->preeditAttributeBlocks,
+                                  sizeof(int) * cblocks);
+            if (blocks == NULL)
+                return;
+            window->preeditAttributeBlocks = blocks;
+            window->cblocks = cblocks;
+        }
+
+        if (currentBlockLocation != currentBlockRange.location)
+        {
+            currentBlockLocation = currentBlockRange.location;
+            window->preeditAttributeBlocks[currentBlockIndex++] = currentBlockLength;
+            currentBlockLength = 0;
+            if (selectedRange.location == currentBlockRange.location)
+                focusedBlock = currentBlockIndex;
+        }
 
         if ([markedTextString getBytes:&codepoint
                              maxLength:sizeof(codepoint)
@@ -730,39 +760,14 @@ static const NSRange kEmptyRange = { NSNotFound, 0 };
                 continue;
 
             window->preeditText[preeditTextLength++] = codepoint;
+            currentBlockLength++;
         }
     }
+    window->preeditAttributeBlocks[currentBlockIndex] = currentBlockLength;
+    window->nblocks = 1 + currentBlockIndex;
     window->ntext = preeditTextLength;
     window->preeditText[preeditTextLength] = 0;
 
-    int focusedBlock = 0;
-    NSInteger offset = 0;
-    window->nblocks = 0;
-    while (offset < length)
-    {
-        NSRange effectiveRange;
-        NSDictionary* attributes = [markedText attributesAtIndex:offset
-                                                  effectiveRange:&effectiveRange];
-
-        if (window->nblocks == window->cblocks)
-        {
-            int cblocks = window->cblocks * 2;
-            int* blocks = realloc(window->preeditAttributeBlocks,
-                                  sizeof(int) * cblocks);
-            if (blocks == NULL)
-                return;
-            window->preeditAttributeBlocks = blocks;
-            window->cblocks = cblocks;
-        }
-        window->preeditAttributeBlocks[window->nblocks] = effectiveRange.length;
-        offset += effectiveRange.length;
-        if (effectiveRange.length == 0)
-            break;
-        NSNumber* underline = (NSNumber*) [attributes objectForKey:@"NSUnderline"];
-        if ([underline intValue] != 1)
-            focusedBlock = window->nblocks;
-        window->nblocks++;
-    }
     // The caret is always at the last of preedit in macOS.
     _glfwInputPreedit(window, focusedBlock, window->ntext);
 }

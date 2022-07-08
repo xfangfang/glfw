@@ -490,6 +490,13 @@ should also declare this in its `Info.plist` by setting the
 @anchor GLFW_X11_INSTANCE_NAME_hint
 __GLFW_X11_CLASS_NAME__ and __GLFW_X11_INSTANCE_NAME__ specifies the desired
 ASCII encoded class and instance parts of the ICCCM `WM_CLASS` window property.
+
+@anchor GLFW_X11_BYPASS_FULLSCREEN_hint
+__GLFW_X11_BYPASS_FULLSCREEN__ specifies whether to disable compositing of a
+window in order to improve performance of rendering fullscreen.  Possible
+values are `GLFW_TRUE` and `GLFW_FALSE`.  You have to specify `GLFW_FALSE`
+when using pop-up windows or IME on a fullscreen.
+
 These are set with @ref glfwWindowHintString.
 
 
@@ -540,6 +547,7 @@ GLFW_COCOA_FRAME_NAME         | `""`                        | A UTF-8 encoded fr
 GLFW_COCOA_GRAPHICS_SWITCHING | `GLFW_FALSE`                | `GLFW_TRUE` or `GLFW_FALSE`
 GLFW_X11_CLASS_NAME           | `""`                        | An ASCII encoded `WM_CLASS` class name
 GLFW_X11_INSTANCE_NAME        | `""`                        | An ASCII encoded `WM_CLASS` instance name
+GLFW_X11_BYPASS_FULLSCREEN    | `GLFW_TRUE`                 | `GLFW_TRUE` or `GLFW_FALSE`
 
 
 @section window_events Window event processing

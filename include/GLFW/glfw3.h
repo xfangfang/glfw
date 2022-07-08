@@ -1104,6 +1104,10 @@ extern "C" {
  *  [window hint](@ref GLFW_X11_CLASS_NAME_hint).
  */
 #define GLFW_X11_INSTANCE_NAME      0x00024002
+/*! @brief X11 specific.
+ *  [window hint](@ref GLFW_X11_BYPASS_FULLSCREEN_hint).
+ */
+#define GLFW_X11_BYPASS_FULLSCREEN  0x00024003
 #define GLFW_WIN32_KEYBOARD_MENU    0x00025001
 /*! @} */
 

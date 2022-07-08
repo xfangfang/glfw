@@ -362,7 +362,7 @@ static void updateWindowMode(_GLFWwindow* window)
         // Enable compositor bypass
         if (!window->x11.transparent)
         {
-            const unsigned long value = 1;
+            const unsigned long value = _glfw.hints.window.x11.bypassFullscreen ? 1 : 2;
 
             XChangeProperty(_glfw.x11.display,  window->x11.handle,
                             _glfw.x11.NET_WM_BYPASS_COMPOSITOR, XA_CARDINAL, 32,

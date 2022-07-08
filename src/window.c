@@ -295,6 +295,11 @@ void glfwDefaultWindowHints(void)
 
     // The default is to use full Retina resolution framebuffers
     _glfw.hints.window.ns.retina = GLFW_TRUE;
+
+    // The default is to improve performance of fullscreen on X11 by
+    // disabling compositing of the window (_NET_WM_BYPASS_COMPOSITOR).
+    // However, this is not suitable when using pop-up windows or IME.
+    _glfw.hints.window.x11.bypassFullscreen  = GLFW_TRUE;
 }
 
 GLFWAPI void glfwWindowHint(int hint, int value)
@@ -377,6 +382,9 @@ GLFWAPI void glfwWindowHint(int hint, int value)
             return;
         case GLFW_WIN32_KEYBOARD_MENU:
             _glfw.hints.window.win32.keymenu = value ? GLFW_TRUE : GLFW_FALSE;
+            return;
+        case GLFW_X11_BYPASS_FULLSCREEN:
+            _glfw.hints.window.x11.bypassFullscreen = value ? GLFW_TRUE : GLFW_FALSE;
             return;
         case GLFW_COCOA_GRAPHICS_SWITCHING:
             _glfw.hints.context.nsgl.offline = value ? GLFW_TRUE : GLFW_FALSE;

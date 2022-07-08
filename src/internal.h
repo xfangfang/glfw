@@ -418,6 +418,7 @@ struct _GLFWwndconfig
     struct {
         char      className[256];
         char      instanceName[256];
+        GLFWbool  bypassFullscreen;
     } x11;
     struct {
         GLFWbool  keymenu;

@@ -37,6 +37,20 @@
 //       having been (according to documentation) added in Mac OS X 10.7
 #define NSWindowCollectionBehaviorFullScreenNone (1 << 9)
 
+// Toggle soft fullscreen mode (macOS's normal fullscreen)
+//
+static void toggleSoftFullscreen(_GLFWwindow* window)
+{
+    // Needs resizable to enter or exit soft fullscreen
+    if (!window->resizable)
+        _glfwSetWindowResizableCocoa(window, GLFW_TRUE);
+
+    [window->ns.object toggleFullScreen:nil];
+
+    if (!window->resizable)
+        _glfwSetWindowResizableCocoa(window, GLFW_FALSE);
+}
+
 // Returns whether the cursor is in the content area of the specified window
 //
 static GLFWbool cursorInContentArea(_GLFWwindow* window)
@@ -1017,6 +1031,14 @@ GLFWbool _glfwCreateWindowCocoa(_GLFWwindow* window,
 {
     @autoreleasepool {
 
+    GLFWbool soft_fullscreen = GLFW_FALSE;
+    if (_glfw.hints.window.softFullscreen && window->monitor)
+    {
+        soft_fullscreen = GLFW_TRUE;
+        // Don't use monitor when soft-fullscreen mode
+        _glfwInputWindowMonitor(window, NULL);
+    }
+
     if (!createNativeWindow(window, wndconfig, fbconfig))
         return GLFW_FALSE;
 
@@ -1080,6 +1102,9 @@ GLFWbool _glfwCreateWindowCocoa(_GLFWwindow* window,
            selector:@selector(imeStatusChangeNotified:)
                name:NSTextInputContextKeyboardSelectionDidChangeNotification
              object:nil];
+
+    if (soft_fullscreen)
+        toggleSoftFullscreen(window);
 
     return GLFW_TRUE;
 
@@ -1348,6 +1373,12 @@ void _glfwSetWindowMonitorCocoa(_GLFWwindow* window,
                                 int refreshRate)
 {
     @autoreleasepool {
+
+    if (_glfw.hints.window.softFullscreen)
+    {
+        toggleSoftFullscreen(window);
+        return;
+    }
 
     if (window->monitor == monitor)
     {

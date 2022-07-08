@@ -372,6 +372,15 @@ You can use the following function to clear the preedit text.
 glfwResetPreeditText(window);
 @endcode
 
+To use IME in the full screen, you can use the
+[GLFW_SOFT_FULLSCREEN](@ref GLFW_SOFT_FULLSCREEN_hint) window hint.
+The default full screen of GLFW is exclusive and is not suitable for IME.
+Setting this window hint enables IME to display properly on the full screen.
+
+@code
+glfwWindowHint(GLFW_SOFT_FULLSCREEN, GLFW_TRUE);
+@endcode
+
 @subsection input_key_name Key names
 
 If you wish to refer to keys by name, you can query the keyboard layout

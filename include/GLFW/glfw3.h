@@ -927,6 +927,12 @@ extern "C" {
  */
 #define GLFW_MOUSE_PASSTHROUGH      0x0002000D
 
+/*! @brief Soft fullscreen window hint
+ *
+ *  Soft fullscreen [window hint](@ref GLFW_SOFT_FULLSCREEN_hint).
+ */
+#define GLFW_SOFT_FULLSCREEN  0x0002000E
+
 /*! @brief Framebuffer bit depth hint.
  *
  *  Framebuffer bit depth [hint](@ref GLFW_RED_BITS).
@@ -1104,10 +1110,6 @@ extern "C" {
  *  [window hint](@ref GLFW_X11_CLASS_NAME_hint).
  */
 #define GLFW_X11_INSTANCE_NAME      0x00024002
-/*! @brief X11 specific.
- *  [window hint](@ref GLFW_X11_BYPASS_FULLSCREEN_hint).
- */
-#define GLFW_X11_BYPASS_FULLSCREEN  0x00024003
 #define GLFW_WIN32_KEYBOARD_MENU    0x00025001
 /*! @} */
 

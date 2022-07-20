@@ -411,6 +411,7 @@ struct _GLFWwndconfig
     GLFWbool      focusOnShow;
     GLFWbool      mousePassthrough;
     GLFWbool      scaleToMonitor;
+    GLFWbool      softFullscreen;
     struct {
         GLFWbool  retina;
         char      frameName[256];
@@ -418,7 +419,6 @@ struct _GLFWwndconfig
     struct {
         char      className[256];
         char      instanceName[256];
-        GLFWbool  bypassFullscreen;
     } x11;
     struct {
         GLFWbool  keymenu;

@@ -31,12 +31,40 @@
 #include <float.h>
 #include <string.h>
 
+// TODO make this WindowHint
+#define SOFT_FULLSCREEN_MODE GLFW_TRUE
+
+// Returns whether the window is in soft fullscreen mode (macOS's normal fullscreen)
+//
+static GLFWbool windowSoftFullscreened(_GLFWwindow* window)
+{
+    return [window->ns.object styleMask] & NSWindowStyleMaskFullScreen;
+}
+
 // Returns the style mask corresponding to the window settings
 //
 static NSUInteger getStyleMask(_GLFWwindow* window)
 {
     NSUInteger styleMask = NSWindowStyleMaskMiniaturizable;
 
+    if (SOFT_FULLSCREEN_MODE)
+    {
+        if (!window->decorated)
+            styleMask |= NSWindowStyleMaskBorderless;
+        else
+            styleMask |= NSWindowStyleMaskTitled |
+                         NSWindowStyleMaskClosable;
+
+        if (window->resizable)
+            styleMask |= NSWindowStyleMaskResizable;
+
+        // This mask must not be removed in soft-fullscrenn.
+        if (windowSoftFullscreened(window))
+            styleMask |= NSWindowStyleMaskFullScreen;
+
+        return styleMask;
+    }
+    
     if (window->monitor || !window->decorated)
         styleMask |= NSWindowStyleMaskBorderless;
     else
@@ -49,6 +77,20 @@ static NSUInteger getStyleMask(_GLFWwindow* window)
     }
 
     return styleMask;
+}
+
+// Toggle soft fullscreen mode (macOS's normal fullscreen)
+//
+static void toggleSoftFullscreen(_GLFWwindow* window)
+{
+    // Needs resizable to enter or exit soft fullscreen
+    NSUInteger styleMaskForFullScreen = [window->ns.object styleMask];
+    styleMaskForFullScreen |= NSWindowStyleMaskResizable;
+    [window->ns.object setStyleMask:styleMaskForFullScreen];
+
+    [window->ns.object toggleFullScreen:nil];
+
+    [window->ns.object setStyleMask:getStyleMask(window)];
 }
 
 // Returns whether the cursor is in the content area of the specified window
@@ -997,6 +1039,14 @@ GLFWbool _glfwCreateWindowCocoa(_GLFWwindow* window,
 {
     @autoreleasepool {
 
+    GLFWbool soft_fullscreen = GLFW_FALSE;
+    if (SOFT_FULLSCREEN_MODE && window->monitor)
+    {
+        soft_fullscreen = GLFW_TRUE;
+        // Don't use monitor when soft-fullscreen mode
+        _glfwInputWindowMonitor(window, NULL);
+    }
+
     if (!createNativeWindow(window, wndconfig, fbconfig))
         return GLFW_FALSE;
 
@@ -1060,6 +1110,9 @@ GLFWbool _glfwCreateWindowCocoa(_GLFWwindow* window,
            selector:@selector(imeStatusChangeNotified:)
                name:NSTextInputContextKeyboardSelectionDidChangeNotification
              object:nil];
+
+    if (soft_fullscreen)
+        toggleSoftFullscreen(window);
 
     return GLFW_TRUE;
 
@@ -1328,6 +1381,12 @@ void _glfwSetWindowMonitorCocoa(_GLFWwindow* window,
                                 int refreshRate)
 {
     @autoreleasepool {
+
+    if (SOFT_FULLSCREEN_MODE)
+    {
+        toggleSoftFullscreen(window);
+        return;
+    }
 
     if (window->monitor == monitor)
     {

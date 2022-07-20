@@ -31,9 +31,6 @@
 #include <float.h>
 #include <string.h>
 
-// TODO make this WindowHint
-#define SOFT_FULLSCREEN_MODE GLFW_TRUE
-
 // Returns whether the window is in soft fullscreen mode (macOS's normal fullscreen)
 //
 static GLFWbool windowSoftFullscreened(_GLFWwindow* window)
@@ -47,7 +44,7 @@ static NSUInteger getStyleMask(_GLFWwindow* window)
 {
     NSUInteger styleMask = NSWindowStyleMaskMiniaturizable;
 
-    if (SOFT_FULLSCREEN_MODE)
+    if (_glfw.hints.window.softFullscreen)
     {
         if (!window->decorated)
             styleMask |= NSWindowStyleMaskBorderless;
@@ -1040,7 +1037,7 @@ GLFWbool _glfwCreateWindowCocoa(_GLFWwindow* window,
     @autoreleasepool {
 
     GLFWbool soft_fullscreen = GLFW_FALSE;
-    if (SOFT_FULLSCREEN_MODE && window->monitor)
+    if (_glfw.hints.window.softFullscreen && window->monitor)
     {
         soft_fullscreen = GLFW_TRUE;
         // Don't use monitor when soft-fullscreen mode
@@ -1382,7 +1379,7 @@ void _glfwSetWindowMonitorCocoa(_GLFWwindow* window,
 {
     @autoreleasepool {
 
-    if (SOFT_FULLSCREEN_MODE)
+    if (_glfw.hints.window.softFullscreen)
     {
         toggleSoftFullscreen(window);
         return;

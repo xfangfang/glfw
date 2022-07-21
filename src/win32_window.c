@@ -469,6 +469,12 @@ static void fitToMonitor(_GLFWwindow* window)
 {
     MONITORINFO mi = { sizeof(mi) };
     GetMonitorInfoW(window->monitor->win32.handle, &mi);
+    // On Win32, the window behaves in a special way when the window covers the screen exactly.
+    // In this case, the window is a strong exclusive exceeding HWND_TOPMOST and it doen't
+    // display OS notifications such as the sound volumn changed.
+    // This behavior can be deactivated by shifting the size slightly.
+    // This is especially necessary for the IME(Input Method Editor/Engine) to display properly.
+    // This can also effect transparency to fullscreen.
     SetWindowPos(window->win32.handle, HWND_TOPMOST,
                  mi.rcMonitor.left,
                  mi.rcMonitor.top,
@@ -2024,6 +2030,12 @@ void _glfwSetWindowMonitorWin32(_GLFWwindow* window,
         acquireMonitor(window);
 
         GetMonitorInfoW(window->monitor->win32.handle, &mi);
+        // On Win32, the window behaves in a special way when the window covers the screen exactly.
+        // In this case, the window is a strong exclusive exceeding HWND_TOPMOST and it doen't
+        // display OS notifications such as the sound volumn changed.
+        // This behavior can be deactivated by shifting the size slightly.
+        // This is especially necessary for the IME(Input Method Editor/Engine) to display properly.
+        // This can also effect transparency to fullscreen.
         SetWindowPos(window->win32.handle, HWND_TOPMOST,
                      mi.rcMonitor.left,
                      mi.rcMonitor.top,

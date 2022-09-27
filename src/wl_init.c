@@ -805,6 +805,10 @@ void _glfwTerminateWayland(void)
         zwp_pointer_constraints_v1_destroy(_glfw.wl.pointerConstraints);
     if (_glfw.wl.idleInhibitManager)
         zwp_idle_inhibit_manager_v1_destroy(_glfw.wl.idleInhibitManager);
+    if (_glfw.wl.textInputManagerV1)
+        zwp_text_input_manager_v1_destroy(_glfw.wl.textInputManagerV1);
+    if (_glfw.wl.textInputManagerV3)
+        zwp_text_input_manager_v3_destroy(_glfw.wl.textInputManagerV3);
     if (_glfw.wl.registry)
         wl_registry_destroy(_glfw.wl.registry);
     if (_glfw.wl.display)

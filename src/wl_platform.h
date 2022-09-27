@@ -278,6 +278,9 @@ typedef struct _GLFWwindowWayland
         _GLFWdecorationWayland             top, left, right, bottom;
         _GLFWdecorationSideWayland         focus;
     } decorations;
+
+    struct zwp_text_input_v1 *text_input_v1;
+    struct zwp_text_input_v3 *text_input_v3;
 } _GLFWwindowWayland;
 
 // Wayland-specific global data

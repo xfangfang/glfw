@@ -50,6 +50,8 @@
 #include "wayland-relative-pointer-unstable-v1-client-protocol.h"
 #include "wayland-pointer-constraints-unstable-v1-client-protocol.h"
 #include "wayland-idle-inhibit-unstable-v1-client-protocol.h"
+#include "wayland-text-input-unstable-v1-client-protocol.h"
+#include "wayland-text-input-unstable-v3-client-protocol.h"
 
 #define GLFW_BORDER_SIZE    4
 #define GLFW_CAPTION_HEIGHT 24
@@ -1788,6 +1790,162 @@ void _glfwAddDataDeviceListenerWayland(struct wl_data_device* device)
     wl_data_device_add_listener(device, &dataDeviceListener, NULL);
 }
 
+static void textInputV1Enter(void *data,
+                             struct zwp_text_input_v1 *zwp_text_input_v1,
+                             struct wl_surface *surface)
+{
+}
+
+static void textInputV1Leave(void *data,
+                             struct zwp_text_input_v1 *zwp_text_input_v1)
+{
+}
+
+static void textInputV1ModifiersMap(void *data,
+                                    struct zwp_text_input_v1 *zwp_text_input_v1,
+                                    struct wl_array *map)
+{
+}
+
+static void textInputV1InputPanelState(void *data,
+                                       struct zwp_text_input_v1 *zwp_text_input_v1,
+                                       uint32_t state)
+{
+}
+
+static void textInputV1PreeditString(void *data,
+                                     struct zwp_text_input_v1 *zwp_text_input_v1,
+                                     uint32_t serial,
+                                     const char *text,
+                                     const char *commit)
+{
+}
+
+static void textInputV1PreeditStyling(void *data,
+                                      struct zwp_text_input_v1 *zwp_text_input_v1,
+                                      uint32_t index,
+                                      uint32_t length,
+                                      uint32_t style)
+{
+}
+
+static void textInputV1PreeditCursor(void *data,
+                                     struct zwp_text_input_v1 *zwp_text_input_v1,
+                                     int32_t index)
+{
+}
+
+static void textInputV1CommitString(void *data,
+                                    struct zwp_text_input_v1 *zwp_text_input_v1,
+                                    uint32_t serial,
+                                    const char *text)
+{
+}
+
+static void textInputV1CursorPosition(void *data,
+                                      struct zwp_text_input_v1 *zwp_text_input_v1,
+                                      int32_t index,
+                                      int32_t anchor)
+{
+}
+
+static void textInputV1DeleteSurroundingText(void *data,
+                                             struct zwp_text_input_v1 *zwp_text_input_v1,
+                                             int32_t index,
+                                             uint32_t length)
+{
+}
+
+static void textInputV1Keysym(void *data,
+                              struct zwp_text_input_v1 *zwp_text_input_v1,
+                              uint32_t serial,
+                              uint32_t time,
+                              uint32_t sym,
+                              uint32_t state,
+                              uint32_t modifiers)
+{
+}
+
+static void textInputV1Language(void *data,
+                                struct zwp_text_input_v1 *zwp_text_input_v1,
+                                uint32_t serial,
+                                const char *language)
+{
+}
+
+static void textInputV1TextDirection(void *data,
+                                     struct zwp_text_input_v1 *zwp_text_input_v1,
+                                     uint32_t serial,
+                                     uint32_t direction)
+{
+}
+
+static const struct zwp_text_input_v1_listener text_input_v1_listener =
+{
+    textInputV1Enter,
+    textInputV1Leave,
+    textInputV1ModifiersMap,
+    textInputV1InputPanelState,
+    textInputV1PreeditString,
+    textInputV1PreeditStyling,
+    textInputV1PreeditCursor,
+    textInputV1CommitString,
+    textInputV1CursorPosition,
+    textInputV1DeleteSurroundingText,
+    textInputV1Keysym,
+    textInputV1Language,
+    textInputV1TextDirection
+};
+
+static void textInputV3Enter(void *data,
+                             struct zwp_text_input_v3 *zwp_text_input_v3,
+                             struct wl_surface *surface)
+{
+}
+
+static void textInputV3Leave(void *data,
+                                struct zwp_text_input_v3 *zwp_text_input_v3,
+                                struct wl_surface *surface)
+{
+}
+
+static void textInputV3PreeditString(void *data,
+                                     struct zwp_text_input_v3 *zwp_text_input_v3,
+                                     const char *text,
+                                     int32_t cursor_begin,
+                                     int32_t cursor_end)
+{
+}
+
+static void textInputV3CommitString(void *data,
+                                    struct zwp_text_input_v3 *zwp_text_input_v3,
+                                    const char *text)
+{
+}
+
+static void textInputV3DeleteSurroundingText(void *data,
+                                             struct zwp_text_input_v3 *zwp_text_input_v3,
+                                             uint32_t before_length,
+                                             uint32_t after_length)
+{
+}
+
+static void textInputV3Done(void *data,
+                            struct zwp_text_input_v3 *zwp_text_input_v3,
+                            uint32_t serial)
+{
+}
+
+static const struct zwp_text_input_v3_listener text_input_v3_listener =
+{
+    textInputV3Enter,
+    textInputV3Leave,
+    textInputV3PreeditString,
+    textInputV3CommitString,
+    textInputV3DeleteSurroundingText,
+    textInputV3Done
+};
+
 
 //////////////////////////////////////////////////////////////////////////
 //////                       GLFW platform API                      //////
@@ -1842,6 +2000,21 @@ GLFWbool _glfwCreateWindowWayland(_GLFWwindow* window,
             return GLFW_FALSE;
     }
 
+    if (_glfw.wl.textInputManagerV3)
+    {
+        window->wl.text_input_v3 =
+            zwp_text_input_manager_v3_get_text_input(_glfw.wl.textInputManagerV3, _glfw.wl.seat);
+	zwp_text_input_v3_add_listener(window->wl.text_input_v3,
+                                       &text_input_v3_listener, window);
+    }
+    else if (_glfw.wl.textInputManagerV1)
+    {
+        window->wl.text_input_v1 =
+            zwp_text_input_manager_v1_create_text_input(_glfw.wl.textInputManagerV1);
+	zwp_text_input_v1_add_listener(window->wl.text_input_v1,
+                                       &text_input_v1_listener, window);
+    }
+
     return GLFW_TRUE;
 }
 
@@ -1852,6 +2025,12 @@ void _glfwDestroyWindowWayland(_GLFWwindow* window)
 
     if (window == _glfw.wl.keyboardFocus)
         _glfw.wl.keyboardFocus = NULL;
+
+    if (window->wl.text_input_v1)
+        zwp_text_input_v1_destroy(window->wl.text_input_v1);
+
+    if (window->wl.text_input_v3)
+        zwp_text_input_v3_destroy(window->wl.text_input_v3);
 
     if (window->wl.idleInhibitor)
         zwp_idle_inhibitor_v1_destroy(window->wl.idleInhibitor);

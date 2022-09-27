@@ -300,6 +300,8 @@ typedef struct _GLFWlibraryWayland
     struct zwp_relative_pointer_manager_v1* relativePointerManager;
     struct zwp_pointer_constraints_v1*      pointerConstraints;
     struct zwp_idle_inhibit_manager_v1*     idleInhibitManager;
+    struct zwp_text_input_manager_v1*       textInputManagerV1;
+    struct zwp_text_input_manager_v3*       textInputManagerV3;
 
     _GLFWofferWayland*          offers;
     unsigned int                offerCount;

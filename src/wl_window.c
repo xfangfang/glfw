@@ -1901,12 +1901,16 @@ static void textInputV3Enter(void *data,
                              struct zwp_text_input_v3 *zwp_text_input_v3,
                              struct wl_surface *surface)
 {
+    zwp_text_input_v3_enable(zwp_text_input_v3);
+    zwp_text_input_v3_commit(zwp_text_input_v3);
 }
 
 static void textInputV3Leave(void *data,
-                                struct zwp_text_input_v3 *zwp_text_input_v3,
-                                struct wl_surface *surface)
+                             struct zwp_text_input_v3 *zwp_text_input_v3,
+                             struct wl_surface *surface)
 {
+    zwp_text_input_v3_disable(zwp_text_input_v3);
+    zwp_text_input_v3_commit(zwp_text_input_v3);
 }
 
 static void textInputV3PreeditString(void *data,
@@ -1915,12 +1919,14 @@ static void textInputV3PreeditString(void *data,
                                      int32_t cursor_begin,
                                      int32_t cursor_end)
 {
+    printf("preedit: %s\n", text);
 }
 
 static void textInputV3CommitString(void *data,
                                     struct zwp_text_input_v3 *zwp_text_input_v3,
                                     const char *text)
 {
+    printf("commit: %s\n", text);
 }
 
 static void textInputV3DeleteSurroundingText(void *data,
@@ -2955,6 +2961,14 @@ const char* _glfwGetClipboardStringWayland(void)
 
 void _glfwUpdatePreeditCursorPosWayland(_GLFWwindow* window)
 {
+    int x = window->preeditCursorPosX;
+    int y = window->preeditCursorPosY;
+    int h = window->preeditCursorHeight;
+
+    if (window->wl.text_input_v3) {
+        zwp_text_input_v3_set_cursor_rectangle(window->wl.text_input_v3, x, y, 0, h);
+        zwp_text_input_v3_commit(window->wl.text_input_v3);
+    }
 }
 
 void _glfwResetPreeditTextWayland(_GLFWwindow* window)

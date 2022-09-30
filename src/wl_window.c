@@ -459,6 +459,22 @@ static void releaseMonitor(_GLFWwindow* window)
     }
 }
 
+static void activateTextInputV1(_GLFWwindow* window)
+{
+    if (!window->wl.textInputV1)
+        return;
+    zwp_text_input_v1_show_input_panel(window->wl.textInputV1);
+    zwp_text_input_v1_activate(window->wl.textInputV1, _glfw.wl.seat, window->wl.surface);
+}
+
+static void deactivateTextInputV1(_GLFWwindow* window)
+{
+    if (!window->wl.textInputV1)
+        return;
+    zwp_text_input_v1_hide_input_panel(window->wl.textInputV1);
+    zwp_text_input_v1_deactivate(window->wl.textInputV1, _glfw.wl.seat);
+}
+
 static void xdgToplevelHandleConfigure(void* userData,
                                        struct xdg_toplevel* toplevel,
                                        int32_t width,
@@ -486,6 +502,7 @@ static void xdgToplevelHandleConfigure(void* userData,
                 break;
             case XDG_TOPLEVEL_STATE_ACTIVATED:
                 window->wl.pending.activated = GLFW_TRUE;
+                activateTextInputV1(window);
                 break;
         }
     }
@@ -1216,6 +1233,12 @@ static void pointerHandleButton(void* userData,
 
     if (!window)
         return;
+
+    // On weston, pressing the title bar will cause leave event and never emit
+    // enter event even though back to content area by pressing mouse button
+    // just after it. So activate it here explicitly.
+    activateTextInputV1(window);
+
     if (button == BTN_LEFT)
     {
         switch (window->wl.decorations.focus)
@@ -1790,113 +1813,6 @@ void _glfwAddDataDeviceListenerWayland(struct wl_data_device* device)
     wl_data_device_add_listener(device, &dataDeviceListener, NULL);
 }
 
-static void textInputV1Enter(void* data,
-                             struct zwp_text_input_v1* textInputV1,
-                             struct wl_surface* surface)
-{
-}
-
-static void textInputV1Leave(void* data,
-                             struct zwp_text_input_v1* textInputV1)
-{
-}
-
-static void textInputV1ModifiersMap(void* data,
-                                    struct zwp_text_input_v1* textInputV1,
-                                    struct wl_array* map)
-{
-}
-
-static void textInputV1InputPanelState(void* data,
-                                       struct zwp_text_input_v1* textInputV1,
-                                       uint32_t state)
-{
-}
-
-static void textInputV1PreeditString(void* data,
-                                     struct zwp_text_input_v1* textInputV1,
-                                     uint32_t serial,
-                                     const char* text,
-                                     const char* commit)
-{
-}
-
-static void textInputV1PreeditStyling(void* data,
-                                      struct zwp_text_input_v1* textInputV1,
-                                      uint32_t index,
-                                      uint32_t length,
-                                      uint32_t style)
-{
-}
-
-static void textInputV1PreeditCursor(void* data,
-                                     struct zwp_text_input_v1* textInputV1,
-                                     int32_t index)
-{
-}
-
-static void textInputV1CommitString(void* data,
-                                    struct zwp_text_input_v1* textInputV1,
-                                    uint32_t serial,
-                                    const char *text)
-{
-}
-
-static void textInputV1CursorPosition(void* data,
-                                      struct zwp_text_input_v1* textInputV1,
-                                      int32_t index,
-                                      int32_t anchor)
-{
-}
-
-static void textInputV1DeleteSurroundingText(void* data,
-                                             struct zwp_text_input_v1* textInputV1,
-                                             int32_t index,
-                                             uint32_t length)
-{
-}
-
-static void textInputV1Keysym(void* data,
-                              struct zwp_text_input_v1* textInputV1,
-                              uint32_t serial,
-                              uint32_t time,
-                              uint32_t sym,
-                              uint32_t state,
-                              uint32_t modifiers)
-{
-}
-
-static void textInputV1Language(void* data,
-                                struct zwp_text_input_v1* textInputV1,
-                                uint32_t serial,
-                                const char* language)
-{
-}
-
-static void textInputV1TextDirection(void* data,
-                                     struct zwp_text_input_v1* textInputV1,
-                                     uint32_t serial,
-                                     uint32_t direction)
-{
-}
-
-static const struct zwp_text_input_v1_listener textInputV1Listener =
-{
-    textInputV1Enter,
-    textInputV1Leave,
-    textInputV1ModifiersMap,
-    textInputV1InputPanelState,
-    textInputV1PreeditString,
-    textInputV1PreeditStyling,
-    textInputV1PreeditCursor,
-    textInputV1CommitString,
-    textInputV1CursorPosition,
-    textInputV1DeleteSurroundingText,
-    textInputV1Keysym,
-    textInputV1Language,
-    textInputV1TextDirection
-};
-
 static void textInputV3Enter(void* data,
                              struct zwp_text_input_v3* textInputV3,
                              struct wl_surface* surface)
@@ -1977,6 +1893,7 @@ static void textInputV3CommitString(void* data,
 {
     _GLFWwindow* window = (_GLFWwindow*) data;
     const char *cur = text;
+
     while (cur && *cur)
     {
         uint32_t codepoint = _glfwDecodeUTF8(&cur);
@@ -2005,6 +1922,120 @@ static const struct zwp_text_input_v3_listener textInputV3Listener =
     textInputV3CommitString,
     textInputV3DeleteSurroundingText,
     textInputV3Done
+};
+
+static void textInputV1Enter(void* data,
+                             struct zwp_text_input_v1* textInputV1,
+                             struct wl_surface* surface)
+{
+    _GLFWwindow* window = (_GLFWwindow*) data;
+    activateTextInputV1(window);
+}
+
+static void textInputV1Leave(void* data,
+                             struct zwp_text_input_v1* textInputV1)
+{
+    _GLFWwindow* window = (_GLFWwindow*) data;
+    deactivateTextInputV1(window);
+}
+
+static void textInputV1ModifiersMap(void* data,
+                                    struct zwp_text_input_v1* textInputV1,
+                                    struct wl_array* map)
+{
+}
+
+static void textInputV1InputPanelState(void* data,
+                                       struct zwp_text_input_v1* textInputV1,
+                                       uint32_t state)
+{
+}
+
+static void textInputV1PreeditString(void* data,
+                                     struct zwp_text_input_v1* textInputV1,
+                                     uint32_t serial,
+                                     const char* text,
+                                     const char* commit)
+{
+    textInputV3PreeditString(data, NULL, text, 0, 0);
+}
+
+static void textInputV1PreeditStyling(void* data,
+                                      struct zwp_text_input_v1* textInputV1,
+                                      uint32_t index,
+                                      uint32_t length,
+                                      uint32_t style)
+{
+}
+
+static void textInputV1PreeditCursor(void* data,
+                                     struct zwp_text_input_v1* textInputV1,
+                                     int32_t index)
+{
+}
+
+static void textInputV1CommitString(void* data,
+                                    struct zwp_text_input_v1* textInputV1,
+                                    uint32_t serial,
+                                    const char *text)
+{
+    textInputV3CommitString(data, NULL, text);
+}
+
+static void textInputV1CursorPosition(void* data,
+                                      struct zwp_text_input_v1* textInputV1,
+                                      int32_t index,
+                                      int32_t anchor)
+{
+}
+
+static void textInputV1DeleteSurroundingText(void* data,
+                                             struct zwp_text_input_v1* textInputV1,
+                                             int32_t index,
+                                             uint32_t length)
+{
+}
+
+static void textInputV1Keysym(void* data,
+                              struct zwp_text_input_v1* textInputV1,
+                              uint32_t serial,
+                              uint32_t time,
+                              uint32_t sym,
+                              uint32_t state,
+                              uint32_t modifiers)
+{
+    printf("keysym\n");
+}
+
+static void textInputV1Language(void* data,
+                                struct zwp_text_input_v1* textInputV1,
+                                uint32_t serial,
+                                const char* language)
+{
+}
+
+static void textInputV1TextDirection(void* data,
+                                     struct zwp_text_input_v1* textInputV1,
+                                     uint32_t serial,
+                                     uint32_t direction)
+{
+}
+
+static const struct zwp_text_input_v1_listener textInputV1Listener =
+{
+    textInputV1Enter,
+    textInputV1Leave,
+    textInputV1ModifiersMap,
+    textInputV1InputPanelState,
+    textInputV1PreeditString,
+    textInputV1PreeditStyling,
+    textInputV1PreeditCursor,
+    textInputV1CommitString,
+    textInputV1CursorPosition,
+    textInputV1DeleteSurroundingText,
+    textInputV1Keysym,
+    textInputV1Language,
+    textInputV1TextDirection
 };
 
 

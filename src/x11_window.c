@@ -411,29 +411,6 @@ static void updateWindowMode(_GLFWwindow* window)
     }
 }
 
-// Decode a Unicode code point from a UTF-8 stream
-// Based on cutef8 by Jeff Bezanson (Public Domain)
-//
-static uint32_t decodeUTF8(const char** s)
-{
-    uint32_t codepoint = 0, count = 0;
-    static const uint32_t offsets[] =
-    {
-        0x00000000u, 0x00003080u, 0x000e2080u,
-        0x03c82080u, 0xfa082080u, 0x82082080u
-    };
-
-    do
-    {
-        codepoint = (codepoint << 6) + (unsigned char) **s;
-        (*s)++;
-        count++;
-    } while ((**s & 0xc0) == 0x80);
-
-    assert(count <= 6);
-    return codepoint - offsets[count - 1];
-}
-
 // Convert the specified Latin-1 string to UTF-8
 //
 static char* convertLatin1toUTF8(const char* source)
@@ -632,7 +609,7 @@ static void _ximPreeditDrawCallback(XIC xic, XPointer clientData, XIMPreeditDraw
         rstart = length;
         for (i = 0, j = 0; i < text->length; i++)
         {
-            codePoint = decodeUTF8(&src);
+            codePoint = _glfwDecodeUTF8(&src);
             if (i < callData->chg_first || callData->chg_first + length < i)
             {
                 continue;
@@ -1506,7 +1483,7 @@ static void processEvent(XEvent *event)
                         const char* c = chars;
                         chars[count] = '\0';
                         while (c - chars < count)
-                            _glfwInputChar(window, decodeUTF8(&c), mods, plain);
+                            _glfwInputChar(window, _glfwDecodeUTF8(&c), mods, plain);
                     }
 
                     if (chars != buffer)

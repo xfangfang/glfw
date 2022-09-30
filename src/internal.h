@@ -989,6 +989,7 @@ _GLFWjoystick* _glfwAllocJoystick(const char* name,
                                   int hatCount);
 void _glfwFreeJoystick(_GLFWjoystick* js);
 void _glfwCenterCursorInContentArea(_GLFWwindow* window);
+uint32_t _glfwDecodeUTF8(const char** s);
 
 GLFWbool _glfwInitEGL(void);
 void _glfwTerminateEGL(void);
@@ -1013,6 +1014,7 @@ void _glfwTerminateVulkan(void);
 const char* _glfwGetVulkanResultString(VkResult result);
 
 size_t _glfwEncodeUTF8(char* s, uint32_t codepoint);
+uint32_t _glfwDecodeUTF8(const char** s);
 char** _glfwParseUriList(char* text, int* count);
 
 char* _glfw_strdup(const char* source);

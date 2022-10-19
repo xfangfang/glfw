@@ -1883,8 +1883,6 @@ static void textInputV3PreeditString(void* data,
         if (cursorLength && window->preeditCaretIndex + cursorLength != window->preeditTextCount)
             window->preeditBlockSizes[window->preeditBlockCount++] = window->preeditTextCount - window->preeditCaretIndex - cursorLength;
     }
-
-    _glfwInputPreedit(window);
 }
 
 static void textInputV3CommitString(void* data,
@@ -1912,6 +1910,8 @@ static void textInputV3Done(void* data,
                             struct zwp_text_input_v3* textInputV3,
                             uint32_t serial)
 {
+    _GLFWwindow* window = (_GLFWwindow*) data;
+    _glfwInputPreedit(window);
 }
 
 static const struct zwp_text_input_v3_listener textInputV3Listener =
@@ -1957,7 +1957,9 @@ static void textInputV1PreeditString(void* data,
                                      const char* text,
                                      const char* commit)
 {
+    _GLFWwindow* window = (_GLFWwindow*) data;
     textInputV3PreeditString(data, NULL, text, 0, 0);
+    _glfwInputPreedit(window);
 }
 
 static void textInputV1PreeditStyling(void* data,

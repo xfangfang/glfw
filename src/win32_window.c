@@ -694,7 +694,6 @@ static GLFWbool getImmPreedit(_GLFWwindow* window)
 //
 static GLFWbool commitImmResultStr(_GLFWwindow* window)
 {
-    _GLFWpreedit* preedit = &window->preedit;
     HIMC hIMC;
     LONG bytes;
     uint32_t codepoint;

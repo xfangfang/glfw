@@ -703,6 +703,7 @@ static const NSRange kEmptyRange = { NSNotFound, 0 };
     int currentBlockIndex = 0;
     int currentBlockLength = 0;
     int currentBlockLocation = 0;
+    int focusedBlockIndex = 0;
     NSInteger preeditTextLength = 0;
     NSRange range = NSMakeRange(0, textLen);
     while (range.length)
@@ -730,7 +731,7 @@ static const NSRange kEmptyRange = { NSNotFound, 0 };
             preedit->blockSizes[currentBlockIndex++] = currentBlockLength;
             currentBlockLength = 0;
             if (selectedRange.location == currentBlockRange.location)
-                preedit->focusedBlockIndex = currentBlockIndex;
+                focusedBlockIndex = currentBlockIndex;
         }
 
         if ([markedTextString getBytes:&codepoint
@@ -752,6 +753,7 @@ static const NSRange kEmptyRange = { NSNotFound, 0 };
     preedit->blockSizesCount = 1 + currentBlockIndex;
     preedit->textCount = preeditTextLength;
     preedit->text[preeditTextLength] = 0;
+    preedit->focusedBlockIndex = focusedBlockIndex;
     // The caret is always at the last of preedit in macOS.
     preedit->caretIndex = preeditTextLength;
 

@@ -1836,52 +1836,53 @@ static void textInputV3PreeditString(void* data,
                                      int32_t cursorEnd)
 {
     _GLFWwindow* window = (_GLFWwindow*) data;
+    _GLFWpreedit* preedit = &window->preedit;
     const char *cur = text;
     unsigned int cursorLength = 0;
 
-    window->preeditTextCount = 0;
-    window->preeditBlockCount = 0;
-    window->preeditFocusedBlockIndex = 0;
-    window->preeditCaretIndex = 0;
+    preedit->textCount = 0;
+    preedit->blockSizesCount = 0;
+    preedit->focusedBlockIndex = 0;
+    preedit->caretIndex = 0;
 
     while (cur && *cur)
     {
         uint32_t codepoint = _glfwDecodeUTF8(&cur);
 
-        ++window->preeditTextCount;
+        ++preedit->textCount;
 
         if (cur == text + cursorBegin)
-            window->preeditCaretIndex = window->preeditTextCount;
+            preedit->caretIndex = preedit->textCount;
         if (cursorBegin != cursorEnd && cur == text + cursorEnd)
-            cursorLength = window->preeditTextCount - cursorBegin;
+            cursorLength = preedit->textCount - cursorBegin;
 
-        if (window->preeditBufferCount < window->preeditTextCount + 1)
+        if (preedit->textBufferCount < preedit->textCount + 1)
         {
-            window->preeditBufferCount = (window->preeditBufferCount == 0) ? 1 : window->preeditBufferCount * 2;
-            window->preeditText = _glfw_realloc(window->preeditText,
-                                                sizeof(unsigned int) * window->preeditBufferCount);
+            preedit->textBufferCount = (preedit->textBufferCount == 0) ? 1 : preedit->textBufferCount * 2;
+            preedit->text = _glfw_realloc(preedit->text,
+                                          sizeof(unsigned int) * preedit->textBufferCount);
         }
-        window->preeditText[window->preeditTextCount - 1] = codepoint;
+        preedit->text[preedit->textCount - 1] = codepoint;
     }
-    if (window->preeditText)
-        window->preeditText[window->preeditTextCount] = 0;
+    if (preedit->text)
+        preedit->text[preedit->textCount] = 0;
 
-    if (window->preeditTextCount)
+    if (preedit->textCount)
     {
-        if (!window->preeditBlockSizes)
+        if (!preedit->blockSizes)
         {
-            window->preeditBlockBufferCount = 3;
-            window->preeditBlockSizes = _glfw_calloc(sizeof(int), window->preeditBlockBufferCount);
+            preedit->blockSizesBufferCount = 3;
+            preedit->blockSizes = _glfw_calloc(sizeof(int), preedit->blockSizesBufferCount);
         }
 
-        if (cursorLength && window->preeditCaretIndex)
-            window->preeditBlockSizes[window->preeditBlockCount++] = window->preeditCaretIndex;
+        if (cursorLength && preedit->caretIndex)
+            preedit->blockSizes[preedit->blockSizesCount++] = preedit->caretIndex;
 
-        window->preeditFocusedBlockIndex = window->preeditBlockCount;
-        window->preeditBlockSizes[window->preeditBlockCount++] = cursorLength ? cursorLength : window->preeditTextCount;
+        preedit->focusedBlockIndex = preedit->blockSizesCount;
+        preedit->blockSizes[preedit->blockSizesCount++] = cursorLength ? cursorLength : preedit->textCount;
 
-        if (cursorLength && window->preeditCaretIndex + cursorLength != window->preeditTextCount)
-            window->preeditBlockSizes[window->preeditBlockCount++] = window->preeditTextCount - window->preeditCaretIndex - cursorLength;
+        if (cursorLength && preedit->caretIndex + cursorLength != preedit->textCount)
+            preedit->blockSizes[preedit->blockSizesCount++] = preedit->textCount - preedit->caretIndex - cursorLength;
     }
 }
 
@@ -3048,9 +3049,10 @@ const char* _glfwGetClipboardStringWayland(void)
 
 void _glfwUpdatePreeditCursorPosWayland(_GLFWwindow* window)
 {
-    int x = window->preeditCursorPosX;
-    int y = window->preeditCursorPosY;
-    int h = window->preeditCursorHeight;
+    _GLFWpreedit* preedit = &window->preedit;
+    int x = preedit->cursorPosX;
+    int y = preedit->cursorPosY;
+    int h = preedit->cursorHeight;
 
     if (window->wl.textInputV3) {
         zwp_text_input_v3_set_cursor_rectangle(window->wl.textInputV3, x, y, 0, h);

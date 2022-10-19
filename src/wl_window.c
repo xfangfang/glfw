@@ -1837,54 +1837,54 @@ static void textInputV3PreeditString(void* data,
 {
     _GLFWwindow* window = (_GLFWwindow*) data;
     const char *cur = text;
-    unsigned int cursorPos = 0;
     unsigned int cursorLength = 0;
-    unsigned int focusedBlock = 0;
 
-    window->ntext = 0;
-    window->nblocks = 0;
+    window->preeditTextCount = 0;
+    window->preeditBlockCount = 0;
+    window->preeditFocusedBlockIndex = 0;
+    window->preeditCaretIndex = 0;
 
     while (cur && *cur)
     {
         uint32_t codepoint = _glfwDecodeUTF8(&cur);
 
-        ++window->ntext;
+        ++window->preeditTextCount;
 
         if (cur == text + cursorBegin)
-            cursorPos = window->ntext;
+            window->preeditCaretIndex = window->preeditTextCount;
         if (cursorBegin != cursorEnd && cur == text + cursorEnd)
-            cursorLength = window->ntext - cursorBegin;
+            cursorLength = window->preeditTextCount - cursorBegin;
 
-        if (window->ctext < window->ntext + 1)
+        if (window->preeditBufferCount < window->preeditTextCount + 1)
         {
-            window->ctext = (window->ctext == 0) ? 1 : window->ctext * 2;
+            window->preeditBufferCount = (window->preeditBufferCount == 0) ? 1 : window->preeditBufferCount * 2;
             window->preeditText = _glfw_realloc(window->preeditText,
-                                                sizeof(unsigned int) * window->ctext);
+                                                sizeof(unsigned int) * window->preeditBufferCount);
         }
-        window->preeditText[window->ntext - 1] = codepoint;
+        window->preeditText[window->preeditTextCount - 1] = codepoint;
     }
     if (window->preeditText)
-        window->preeditText[window->ntext] = 0;
+        window->preeditText[window->preeditTextCount] = 0;
 
-    if (window->ntext)
+    if (window->preeditTextCount)
     {
-        if (!window->preeditAttributeBlocks)
+        if (!window->preeditBlockSizes)
         {
-            window->cblocks = 3;
-            window->preeditAttributeBlocks = _glfw_calloc(sizeof(int), window->cblocks);
+            window->preeditBlockBufferCount = 3;
+            window->preeditBlockSizes = _glfw_calloc(sizeof(int), window->preeditBlockBufferCount);
         }
 
-        if (cursorLength && cursorPos)
-            window->preeditAttributeBlocks[window->nblocks++] = cursorPos;
+        if (cursorLength && window->preeditCaretIndex)
+            window->preeditBlockSizes[window->preeditBlockCount++] = window->preeditCaretIndex;
 
-        focusedBlock = window->nblocks;
-        window->preeditAttributeBlocks[window->nblocks++] = cursorLength ? cursorLength : window->ntext;
+        window->preeditFocusedBlockIndex = window->preeditBlockCount;
+        window->preeditBlockSizes[window->preeditBlockCount++] = cursorLength ? cursorLength : window->preeditTextCount;
 
-        if (cursorLength && cursorPos + cursorLength != window->ntext)
-            window->preeditAttributeBlocks[window->nblocks++] = window->ntext - cursorPos - cursorLength;
+        if (cursorLength && window->preeditCaretIndex + cursorLength != window->preeditTextCount)
+            window->preeditBlockSizes[window->preeditBlockCount++] = window->preeditTextCount - window->preeditCaretIndex - cursorLength;
     }
 
-    _glfwInputPreedit(window, focusedBlock, cursorPos);
+    _glfwInputPreedit(window);
 }
 
 static void textInputV3CommitString(void* data,

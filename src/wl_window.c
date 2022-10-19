@@ -1845,6 +1845,7 @@ static void textInputV3PreeditString(void* data,
     preedit->focusedBlockIndex = 0;
     preedit->caretIndex = 0;
 
+    // Store preedit text
     while (cur && *cur)
     {
         uint32_t codepoint = _glfwDecodeUTF8(&cur);
@@ -1858,31 +1859,45 @@ static void textInputV3PreeditString(void* data,
 
         if (preedit->textBufferCount < preedit->textCount + 1)
         {
-            preedit->textBufferCount = (preedit->textBufferCount == 0) ? 1 : preedit->textBufferCount * 2;
+            int bufSize = preedit->textBufferCount;
+
+            bufSize = (bufSize == 0) ? 1 : bufSize * 2;
             preedit->text = _glfw_realloc(preedit->text,
-                                          sizeof(unsigned int) * preedit->textBufferCount);
+                                          sizeof(unsigned int) * bufSize);
+            preedit->textBufferCount = bufSize;
         }
         preedit->text[preedit->textCount - 1] = codepoint;
     }
     if (preedit->text)
         preedit->text[preedit->textCount] = 0;
 
+    // Store preedit blocks
     if (preedit->textCount)
     {
+        int *blocks;
+        int blockCount = preedit->blockSizesCount;
+        int cursorPos = preedit->caretIndex;
+        int textCount = preedit->textCount;
+
         if (!preedit->blockSizes)
         {
-            preedit->blockSizesBufferCount = 3;
-            preedit->blockSizes = _glfw_calloc(sizeof(int), preedit->blockSizesBufferCount);
+            int bufSize = 3;
+
+            preedit->blockSizesBufferCount = bufSize;
+            preedit->blockSizes = _glfw_calloc(sizeof(int), bufSize);
+            blocks = preedit->blockSizes;
         }
 
-        if (cursorLength && preedit->caretIndex)
-            preedit->blockSizes[preedit->blockSizesCount++] = preedit->caretIndex;
+        if (cursorLength && cursorPos)
+            blocks[blockCount++] = cursorPos;
 
-        preedit->focusedBlockIndex = preedit->blockSizesCount;
-        preedit->blockSizes[preedit->blockSizesCount++] = cursorLength ? cursorLength : preedit->textCount;
+        preedit->focusedBlockIndex = blockCount;
+        blocks[blockCount++] = cursorLength ? cursorLength : textCount;
 
-        if (cursorLength && preedit->caretIndex + cursorLength != preedit->textCount)
-            preedit->blockSizes[preedit->blockSizesCount++] = preedit->textCount - preedit->caretIndex - cursorLength;
+        if (cursorLength && cursorPos + cursorLength != textCount)
+            blocks[blockCount++] = textCount - cursorPos - cursorLength;
+
+        preedit->blockSizesCount = blockCount;
     }
 }
 

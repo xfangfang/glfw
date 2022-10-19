@@ -2004,7 +2004,6 @@ static void textInputV1Keysym(void* data,
                               uint32_t state,
                               uint32_t modifiers)
 {
-    printf("keysym\n");
 }
 
 static void textInputV1Language(void* data,

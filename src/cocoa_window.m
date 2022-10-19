@@ -683,17 +683,18 @@ static const NSRange kEmptyRange = { NSNotFound, 0 };
     NSString* markedTextString = markedText.string;
 
     NSUInteger textLen = [markedTextString length];
-    int textBufferCount = window->preeditBufferCount;
+    _GLFWpreedit* preedit = &window->preedit;
+    int textBufferCount = preedit->textBufferCount;
     while (textBufferCount < textLen + 1)
         textBufferCount = textBufferCount == 0 ? 1 : textBufferCount * 2;
-    if (textBufferCount != window->preeditBufferCount)
+    if (textBufferCount != preedit->textBufferCount)
     {
-        unsigned int* preeditText = realloc(window->preeditText,
+        unsigned int* preeditText = realloc(preedit->text,
                                             sizeof(unsigned int) * textBufferCount);
         if (preeditText == NULL)
             return;
-        window->preeditText = preeditText;
-        window->preeditBufferCount = textBufferCount;
+        preedit->text = preeditText;
+        preedit->textBufferCount = textBufferCount;
     }
 
     // NSString handles text data in UTF16 by default, so we have to convert them
@@ -711,25 +712,25 @@ static const NSRange kEmptyRange = { NSNotFound, 0 };
         [markedText attributesAtIndex:range.location
                        effectiveRange:&currentBlockRange];
 
-        if (window->preeditBlockBufferCount < 1 + currentBlockIndex)
+        if (preedit->blockSizesBufferCount < 1 + currentBlockIndex)
         {
-            int blockBufferCount = (window->preeditBlockBufferCount == 0)
-                ? 1 : window->preeditBlockBufferCount * 2;
-            int* blocks = realloc(window->preeditBlockSizes,
+            int blockBufferCount = (preedit->blockSizesBufferCount == 0)
+                ? 1 : preedit->blockSizesBufferCount * 2;
+            int* blocks = realloc(preedit->blockSizes,
                                   sizeof(int) * blockBufferCount);
             if (blocks == NULL)
                 return;
-            window->preeditBlockSizes = blocks;
-            window->preeditBlockBufferCount = blockBufferCount;
+            preedit->blockSizes = blocks;
+            preedit->blockSizesBufferCount = blockBufferCount;
         }
 
         if (currentBlockLocation != currentBlockRange.location)
         {
             currentBlockLocation = currentBlockRange.location;
-            window->preeditBlockSizes[currentBlockIndex++] = currentBlockLength;
+            preedit->blockSizes[currentBlockIndex++] = currentBlockLength;
             currentBlockLength = 0;
             if (selectedRange.location == currentBlockRange.location)
-                window->preeditFocusedBlockIndex = currentBlockIndex;
+                preedit->focusedBlockIndex = currentBlockIndex;
         }
 
         if ([markedTextString getBytes:&codepoint
@@ -743,16 +744,16 @@ static const NSRange kEmptyRange = { NSNotFound, 0 };
             if (codepoint >= 0xf700 && codepoint <= 0xf7ff)
                 continue;
 
-            window->preeditText[preeditTextLength++] = codepoint;
+            preedit->text[preeditTextLength++] = codepoint;
             currentBlockLength++;
         }
     }
-    window->preeditBlockSizes[currentBlockIndex] = currentBlockLength;
-    window->preeditBlockCount = 1 + currentBlockIndex;
-    window->preeditTextCount = preeditTextLength;
-    window->preeditText[preeditTextLength] = 0;
+    preedit->blockSizes[currentBlockIndex] = currentBlockLength;
+    preedit->blockSizesCount = 1 + currentBlockIndex;
+    preedit->textCount = preeditTextLength;
+    preedit->text[preeditTextLength] = 0;
     // The caret is always at the last of preedit in macOS.
-    window->preeditCaretIndex = preeditTextLength;
+    preedit->caretIndex = preeditTextLength;
 
     _glfwInputPreedit(window);
 }
@@ -760,10 +761,10 @@ static const NSRange kEmptyRange = { NSNotFound, 0 };
 - (void)unmarkText
 {
     [[markedText mutableString] setString:@""];
-    window->preeditBlockCount = 0;
-    window->preeditTextCount = 0;
-    window->preeditFocusedBlockIndex = 0;
-    window->preeditCaretIndex = 0;
+    window->preedit.blockSizesCount = 0;
+    window->preedit.textCount = 0;
+    window->preedit.focusedBlockIndex = 0;
+    window->preedit.caretIndex = 0;
     _glfwInputPreedit(window);
 }
 
@@ -786,9 +787,9 @@ static const NSRange kEmptyRange = { NSNotFound, 0 };
 - (NSRect)firstRectForCharacterRange:(NSRange)range
                          actualRange:(NSRangePointer)actualRange
 {
-    int x = window->preeditCursorPosX;
-    int y = window->preeditCursorPosY;
-    int h = window->preeditCursorHeight;
+    int x = window->preedit.cursorPosX;
+    int y = window->preedit.cursorPosY;
+    int h = window->preedit.cursorHeight;
 
     const NSRect frame =
         [window->ns.object contentRectForFrameRect:[window->ns.object frame]];

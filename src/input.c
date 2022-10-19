@@ -336,13 +336,14 @@ void _glfwInputPreedit(_GLFWwindow* window)
 {
     if (window->callbacks.preedit)
     {
+        _GLFWpreedit *preedit = &window->preedit;
         window->callbacks.preedit((GLFWwindow*) window,
-                                  window->preeditTextCount,
-                                  window->preeditText,
-                                  window->preeditBlockCount,
-                                  window->preeditBlockSizes,
-                                  window->preeditFocusedBlockIndex,
-                                  window->preeditCaretIndex);
+                                  preedit->textCount,
+                                  preedit->text,
+                                  preedit->blockSizesCount,
+                                  preedit->blockSizes,
+                                  preedit->focusedBlockIndex,
+                                  preedit->caretIndex);
     }
 }
 
@@ -975,26 +976,28 @@ GLFWAPI void glfwSetCursor(GLFWwindow* windowHandle, GLFWcursor* cursorHandle)
 GLFWAPI void glfwGetPreeditCursorPos(GLFWwindow* handle, int *x, int *y, int *h)
 {
     _GLFWwindow* window = (_GLFWwindow*) handle;
+    _GLFWpreedit* preedit = &window->preedit;
     if (x)
-        *x = window->preeditCursorPosX;
+        *x = preedit->cursorPosX;
     if (y)
-        *y = window->preeditCursorPosY;
+        *y = preedit->cursorPosY;
     if (h)
-        *h = window->preeditCursorHeight;
+        *h = preedit->cursorHeight;
 }
 
 GLFWAPI void glfwSetPreeditCursorPos(GLFWwindow* handle, int x, int y, int h)
 {
     _GLFWwindow* window = (_GLFWwindow*) handle;
+    _GLFWpreedit* preedit = &window->preedit;
 
-    if (x == window->preeditCursorPosX &&
-        y == window->preeditCursorPosY &&
-        h == window->preeditCursorHeight)
+    if (x == preedit->cursorPosX &&
+        y == preedit->cursorPosY &&
+        h == preedit->cursorHeight)
         return;
 
-    window->preeditCursorPosX = x;
-    window->preeditCursorPosY = y;
-    window->preeditCursorHeight = h;
+    preedit->cursorPosX = x;
+    preedit->cursorPosY = y;
+    preedit->cursorHeight = h;
 
     _glfw.platform.updatePreeditCursorPos(window);
 }

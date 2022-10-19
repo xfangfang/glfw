@@ -67,6 +67,7 @@ typedef struct _GLFWwndconfig   _GLFWwndconfig;
 typedef struct _GLFWctxconfig   _GLFWctxconfig;
 typedef struct _GLFWfbconfig    _GLFWfbconfig;
 typedef struct _GLFWcontext     _GLFWcontext;
+typedef struct _GLFWpreedit     _GLFWpreedit;
 typedef struct _GLFWwindow      _GLFWwindow;
 typedef struct _GLFWplatform    _GLFWplatform;
 typedef struct _GLFWlibrary     _GLFWlibrary;
@@ -516,6 +517,18 @@ struct _GLFWcontext
     GLFW_PLATFORM_CONTEXT_STATE
 };
 
+struct _GLFWpreedit {
+    unsigned int*       text;
+    int                 textCount;
+    int                 textBufferCount;
+    int*                blockSizes;
+    int                 blockSizesCount;
+    int                 blockSizesBufferCount;
+    int                 focusedBlockIndex;
+    int                 caretIndex;
+    int                 cursorPosX, cursorPosY, cursorHeight;
+};
+
 // Window and context structure
 //
 struct _GLFWwindow
@@ -550,19 +563,9 @@ struct _GLFWwindow
     double              virtualCursorPosX, virtualCursorPosY;
     GLFWbool            rawMouseMotion;
 
-    // Preedit texts
-    unsigned int*       preeditText;
-    int                 preeditTextCount;
-    int                 preeditBufferCount;
-    int*                preeditBlockSizes;
-    int                 preeditBlockCount;
-    int                 preeditBlockBufferCount;
-    int                 preeditFocusedBlockIndex;
-    int                 preeditCaretIndex;
-
-    int                 preeditCursorPosX, preeditCursorPosY, preeditCursorHeight;
-
     _GLFWcontext        context;
+
+    _GLFWpreedit        preedit;
 
     struct {
         GLFWwindowposfun          pos;

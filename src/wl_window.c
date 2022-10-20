@@ -1874,7 +1874,7 @@ static void textInputV3PreeditString(void* data,
     // Store preedit blocks
     if (preedit->textCount)
     {
-        int *blocks;
+        int *blocks = preedit->blockSizes;
         int blockCount = preedit->blockSizesCount;
         int cursorPos = preedit->caretIndex;
         int textCount = preedit->textCount;

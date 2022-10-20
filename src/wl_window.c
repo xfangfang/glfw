@@ -3073,6 +3073,10 @@ void _glfwUpdatePreeditCursorPosWayland(_GLFWwindow* window)
         zwp_text_input_v3_set_cursor_rectangle(window->wl.textInputV3, x, y, 0, h);
         zwp_text_input_v3_commit(window->wl.textInputV3);
     }
+    else if (window->wl.textInputV1)
+    {
+        zwp_text_input_v1_set_cursor_rectangle(window->wl.textInputV1, x, y, 0, h);
+    }
 }
 
 void _glfwResetPreeditTextWayland(_GLFWwindow* window)

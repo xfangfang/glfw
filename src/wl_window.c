@@ -1927,6 +1927,7 @@ static void textInputV3Done(void* data,
                             uint32_t serial)
 {
     _GLFWwindow* window = (_GLFWwindow*) data;
+    _glfwUpdatePreeditCursorPosWayland(window);
     _glfwInputPreedit(window);
 }
 

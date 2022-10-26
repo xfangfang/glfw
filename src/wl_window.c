@@ -1949,10 +1949,31 @@ static void textInputV1Enter(void* data,
     activateTextInputV1(window);
 }
 
+static void textInputV1Reset(_GLFWwindow* window)
+{
+    _GLFWpreedit* preedit = &window->preedit;
+
+    preedit->textCount = 0;
+    preedit->blockSizesCount = 0;
+    preedit->focusedBlockIndex = 0;
+    preedit->caretIndex = 0;
+
+    _glfw_free(window->wl.textInputV1Context.preeditText);
+    _glfw_free(window->wl.textInputV1Context.commitTextOnReset);
+    window->wl.textInputV1Context.preeditText = NULL;
+    window->wl.textInputV1Context.commitTextOnReset = NULL;
+
+    _glfwInputPreedit(window);
+}
+
 static void textInputV1Leave(void* data,
                              struct zwp_text_input_v1* textInputV1)
 {
     _GLFWwindow* window = (_GLFWwindow*) data;
+    char* commitText = window->wl.textInputV1Context.commitTextOnReset;
+
+    textInputV3CommitString(data, NULL, commitText);
+    textInputV1Reset(window);
     deactivateTextInputV1(window);
 }
 
@@ -1975,6 +1996,12 @@ static void textInputV1PreeditString(void* data,
                                      const char* commit)
 {
     _GLFWwindow* window = (_GLFWwindow*) data;
+
+    _glfw_free(window->wl.textInputV1Context.preeditText);
+    _glfw_free(window->wl.textInputV1Context.commitTextOnReset);
+    window->wl.textInputV1Context.preeditText = strdup(text);
+    window->wl.textInputV1Context.commitTextOnReset = strdup(commit);
+
     textInputV3PreeditString(data, NULL, text, 0, 0);
     _glfwInputPreedit(window);
 }
@@ -1991,6 +2018,24 @@ static void textInputV1PreeditCursor(void* data,
                                      struct zwp_text_input_v1* textInputV1,
                                      int32_t index)
 {
+    _GLFWwindow* window = (_GLFWwindow*) data;
+    _GLFWpreedit* preedit = &window->preedit;
+    const char* text = window->wl.textInputV1Context.preeditText;
+    const char* cur = text;
+
+    preedit->caretIndex = 0;
+    if (index <= 0 || preedit->textCount == 0)
+        return;
+
+    while (cur && *cur)
+    {
+        _glfwDecodeUTF8(&cur);
+        ++preedit->caretIndex;
+        if (cur >= text + index)
+            break;
+        if (preedit->caretIndex > preedit->textCount)
+            break;
+    }
 }
 
 static void textInputV1CommitString(void* data,
@@ -1998,6 +2043,9 @@ static void textInputV1CommitString(void* data,
                                     uint32_t serial,
                                     const char *text)
 {
+    _GLFWwindow* window = (_GLFWwindow*) data;
+
+    textInputV1Reset(window);
     textInputV3CommitString(data, NULL, text);
 }
 
@@ -2006,6 +2054,7 @@ static void textInputV1CursorPosition(void* data,
                                       int32_t index,
                                       int32_t anchor)
 {
+    // It's for surrounding text feature which isn't supported by GLFW.
 }
 
 static void textInputV1DeleteSurroundingText(void* data,
@@ -2136,8 +2185,11 @@ void _glfwDestroyWindowWayland(_GLFWwindow* window)
     if (window == _glfw.wl.keyboardFocus)
         _glfw.wl.keyboardFocus = NULL;
 
-    if (window->wl.textInputV1)
+    if (window->wl.textInputV1) {
         zwp_text_input_v1_destroy(window->wl.textInputV1);
+        _glfw_free(window->wl.textInputV1Context.preeditText);
+        _glfw_free(window->wl.textInputV1Context.commitTextOnReset);
+    }
 
     if (window->wl.textInputV3)
         zwp_text_input_v3_destroy(window->wl.textInputV3);

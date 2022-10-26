@@ -281,6 +281,10 @@ typedef struct _GLFWwindowWayland
 
     struct zwp_text_input_v1 *textInputV1;
     struct zwp_text_input_v3 *textInputV3;
+    struct {
+        char* preeditText;
+        char* commitTextOnReset;
+    } textInputV1Context;
 } _GLFWwindowWayland;
 
 // Wayland-specific global data

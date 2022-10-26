@@ -517,7 +517,10 @@ struct _GLFWcontext
     GLFW_PLATFORM_CONTEXT_STATE
 };
 
-struct _GLFWpreedit {
+// Preedit structure for Input Method Editor/Engine
+//
+struct _GLFWpreedit
+{
     unsigned int*       text;
     int                 textCount;
     int                 textBufferCount;

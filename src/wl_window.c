@@ -3070,7 +3070,8 @@ void _glfwUpdatePreeditCursorPosWayland(_GLFWwindow* window)
     int y = preedit->cursorPosY;
     int h = preedit->cursorHeight;
 
-    if (window->wl.textInputV3) {
+    if (window->wl.textInputV3)
+    {
         zwp_text_input_v3_set_cursor_rectangle(window->wl.textInputV3, x, y, 0, h);
         zwp_text_input_v3_commit(window->wl.textInputV3);
     }

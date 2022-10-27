@@ -998,7 +998,6 @@ _GLFWjoystick* _glfwAllocJoystick(const char* name,
                                   int hatCount);
 void _glfwFreeJoystick(_GLFWjoystick* js);
 void _glfwCenterCursorInContentArea(_GLFWwindow* window);
-uint32_t _glfwDecodeUTF8(const char** s);
 
 GLFWbool _glfwInitEGL(void);
 void _glfwTerminateEGL(void);

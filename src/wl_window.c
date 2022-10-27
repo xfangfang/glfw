@@ -2072,6 +2072,50 @@ static void textInputV1Keysym(void* data,
                               uint32_t state,
                               uint32_t modifiers)
 {
+    uint32_t scancode;
+
+    // This code supports only weston-keyboard because we aren't aware
+    // of any other input methods that actually support this API.
+    // Supporting all keysyms is overkill for now.
+
+    switch (sym)
+    {
+        case XKB_KEY_Left:
+            scancode = KEY_LEFT;
+            break;
+        case XKB_KEY_Right:
+            scancode = KEY_RIGHT;
+            break;
+        case XKB_KEY_Up:
+            scancode = KEY_UP;
+            break;
+        case XKB_KEY_Down:
+            scancode = KEY_DOWN;
+            break;
+        case XKB_KEY_BackSpace:
+            scancode = KEY_BACKSPACE;
+            break;
+        case XKB_KEY_Tab:
+            scancode = KEY_TAB;
+            break;
+        case XKB_KEY_KP_Enter:
+            scancode = KEY_KPENTER;
+            break;
+        case XKB_KEY_Return:
+            scancode = KEY_ENTER;
+            break;
+        default:
+            return;
+    }
+
+    _glfw.wl.xkb.modifiers = modifiers;
+
+    keyboardHandleKey(data,
+                      _glfw.wl.keyboard,
+                      serial,
+                      time,
+                      scancode,
+                      state);
 }
 
 static void textInputV1Language(void* data,

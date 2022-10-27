@@ -330,7 +330,7 @@ void _glfwInputChar(_GLFWwindow* window, uint32_t codepoint, int mods, GLFWbool 
     }
 }
 
-// Notifies shrared code of a preedit event
+// Notifies shared code of a preedit event
 //
 void _glfwInputPreedit(_GLFWwindow* window)
 {

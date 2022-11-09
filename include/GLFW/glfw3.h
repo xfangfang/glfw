@@ -5104,7 +5104,7 @@ GLFWAPI void glfwSetCursor(GLFWwindow* window, GLFWcursor* cursor);
  *
  *  @ingroup input
  */
-GLFWAPI void glfwGetPreeditCursorPos(GLFWwindow* window, int *x, int *y, int *h);
+GLFWAPI void glfwGetPreeditCursorPos(GLFWwindow* window, int* x, int* y, int* h);
 
 /*! @brief Notify the text cursor position to window system to decide the candidate window position.
  *

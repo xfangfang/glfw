@@ -279,8 +279,8 @@ typedef struct _GLFWwindowWayland
         _GLFWdecorationSideWayland         focus;
     } decorations;
 
-    struct zwp_text_input_v1 *textInputV1;
-    struct zwp_text_input_v3 *textInputV3;
+    struct zwp_text_input_v1* textInputV1;
+    struct zwp_text_input_v3* textInputV3;
     struct {
         char* preeditText;
         char* commitTextOnReset;

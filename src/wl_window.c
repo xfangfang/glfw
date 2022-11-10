@@ -1813,6 +1813,11 @@ void _glfwAddDataDeviceListenerWayland(struct wl_data_device* device)
     wl_data_device_add_listener(device, &dataDeviceListener, NULL);
 }
 
+// Callbacks for text_input_unstable_v3 protocol.
+//
+// This protocol is widely supported by major desktop environments such as GNOME
+// or KDE.
+//
 static void textInputV3Enter(void* data,
                              struct zwp_text_input_v3* textInputV3,
                              struct wl_surface* surface)
@@ -1941,6 +1946,12 @@ static const struct zwp_text_input_v3_listener textInputV3Listener =
     textInputV3Done
 };
 
+// Callbacks for text_input_unstable_v1 protocol
+//
+// This protocol isn't so popular but Weston which is the reference Wayland
+// implementation supports only this protocol and doesn't support
+// text_input_unstable_v3.
+//
 static void textInputV1Enter(void* data,
                              struct zwp_text_input_v1* textInputV1,
                              struct wl_surface* surface)

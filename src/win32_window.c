@@ -759,6 +759,14 @@ static LRESULT CALLBACK windowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
 
     switch (uMsg)
     {
+        case WM_IME_SETCONTEXT:
+        {
+            // To draw preedit text by an application side
+            if ((lParam & ISC_SHOWUICOMPOSITIONWINDOW) > 0)
+                lParam &= ~ISC_SHOWUICOMPOSITIONWINDOW;
+            break;
+        }
+
         case WM_MOUSEACTIVATE:
         {
             // HACK: Postpone cursor disabling when the window was activated by

@@ -155,11 +155,32 @@ static void init_font_list()
     fontNum++;
 
 #if defined(TTF_FONT_FILEPATH)
-    fontFamilyNames[fontNum] = "Custom";
-    fontFilePaths[fontNum] = TTF_FONT_FILEPATH;
-    currentFontIndex = fontNum;
-    fontNum++;
+    if (TTF_FONT_FILEPATH && *TTF_FONT_FILEPATH)
+    {
+        fontFilePaths[fontNum] = TTF_FONT_FILEPATH;
+        fontFamilyNames[fontNum] = "Custom";
+    }
+    else
 #endif
+    if (glfwGetPlatform() == GLFW_PLATFORM_COCOA)
+    {
+        fontFilePaths[fontNum] = "/Library/Fonts/Arial Unicode.ttf";
+        fontFamilyNames[fontNum] = "Arial Unicode MS";
+    }
+    else
+    {
+        fontFilePaths[fontNum] = NULL;
+    }
+    if (fontFilePaths[fontNum])
+    {
+        FILE *fp = fopen(fontFilePaths[fontNum], "rb");
+        if (fp)
+        {
+            currentFontIndex = fontNum;
+            fontNum++;
+            fclose(fp);
+        }
+    }
 }
 #else
 static void init_font_list()

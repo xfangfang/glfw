@@ -660,7 +660,7 @@ static const NSRange kEmptyRange = { NSNotFound, 0 };
 - (NSRange)markedRange
 {
     if ([markedText length] > 0)
-        return NSMakeRange(0, [markedText length] - 1);
+        return NSMakeRange(0, [markedText length]);
     else
         return kEmptyRange;
 }

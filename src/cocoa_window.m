@@ -1993,13 +1993,19 @@ void _glfwUpdatePreeditCursorPosCocoa(_GLFWwindow* window)
 
 void _glfwResetPreeditTextCocoa(_GLFWwindow* window)
 {
+    @autoreleasepool {
+
     NSTextInputContext* context = [NSTextInputContext currentInputContext];
     [context discardMarkedText];
     [window->ns.view unmarkText];
+
+    } // autoreleasepool
 }
 
 void _glfwSetIMEStatusCocoa(_GLFWwindow* window, int active)
 {
+    @autoreleasepool {
+
     // Mac OS has several input sources.
     // this code assumes input methods not in ascii capable inputs using IME.
     NSArray* asciiInputSources =
@@ -2032,10 +2038,14 @@ void _glfwSetIMEStatusCocoa(_GLFWwindow* window, int active)
     {
         TISSelectInputSource(asciiSource);
     }
+
+    } // autoreleasepool
 }
 
 int _glfwGetIMEStatusCocoa(_GLFWwindow* window)
 {
+    @autoreleasepool {
+
     NSArray* asciiInputSources =
         CFBridgingRelease(TISCreateASCIICapableInputSourceList());
     TISInputSourceRef asciiSource =
@@ -2054,6 +2064,8 @@ int _glfwGetIMEStatusCocoa(_GLFWwindow* window)
             ? GLFW_FALSE : GLFW_TRUE;
     }
     return GLFW_FALSE;
+
+    } // autoreleasepool
 }
 
 EGLenum _glfwGetEGLPlatformCocoa(EGLint** attribs)

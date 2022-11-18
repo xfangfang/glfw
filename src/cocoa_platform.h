@@ -109,11 +109,20 @@ typedef VkResult (APIENTRY *PFN_vkCreateMetalSurfaceEXT)(VkInstance,const VkMeta
 #define GLFW_NSGL_LIBRARY_CONTEXT_STATE _GLFWlibraryNSGL nsgl;
 
 // HIToolbox.framework pointer typedefs
+#define kTISPropertyInputSourceID _glfw.ns.tis.kPropertyInputSourceID
 #define kTISPropertyUnicodeKeyLayoutData _glfw.ns.tis.kPropertyUnicodeKeyLayoutData
+typedef TISInputSourceRef (*PFN_TISCopyCurrentKeyboardInputSource)(void);
+#define TISCopyCurrentKeyboardInputSource _glfw.ns.tis.CopyCurrentKeyboardInputSource
 typedef TISInputSourceRef (*PFN_TISCopyCurrentKeyboardLayoutInputSource)(void);
 #define TISCopyCurrentKeyboardLayoutInputSource _glfw.ns.tis.CopyCurrentKeyboardLayoutInputSource
+typedef CFArrayRef (*PFN_TISCreateASCIICapableInputSourceList)(void);
+#define TISCreateASCIICapableInputSourceList _glfw.ns.tis.CreateASCIICapableInputSourceList
+typedef CFArrayRef (*PFN_TISCreateInputSourceList)(CFDictionaryRef,Boolean);
+#define TISCreateInputSourceList _glfw.ns.tis.CreateInputSourceList
 typedef void* (*PFN_TISGetInputSourceProperty)(TISInputSourceRef,CFStringRef);
 #define TISGetInputSourceProperty _glfw.ns.tis.GetInputSourceProperty
+typedef OSStatus (*PFN_TISSelectInputSource)(TISInputSourceRef);
+#define TISSelectInputSource _glfw.ns.tis.SelectInputSource
 typedef UInt8 (*PFN_LMGetKbdType)(void);
 #define LMGetKbdType _glfw.ns.tis.GetKbdType
 
@@ -184,9 +193,14 @@ typedef struct _GLFWlibraryNS
 
     struct {
         CFBundleRef     bundle;
+        PFN_TISCopyCurrentKeyboardInputSource CopyCurrentKeyboardInputSource;
         PFN_TISCopyCurrentKeyboardLayoutInputSource CopyCurrentKeyboardLayoutInputSource;
+        PFN_TISCreateASCIICapableInputSourceList CreateASCIICapableInputSourceList;
+        PFN_TISCreateInputSourceList CreateInputSourceList;
         PFN_TISGetInputSourceProperty GetInputSourceProperty;
+        PFN_TISSelectInputSource SelectInputSource;
         PFN_LMGetKbdType GetKbdType;
+        CFStringRef     kPropertyInputSourceID;
         CFStringRef     kPropertyUnicodeKeyLayoutData;
     } tis;
 } _GLFWlibraryNS;

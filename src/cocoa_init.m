@@ -351,22 +351,42 @@ static GLFWbool initializeTIS(void)
         return GLFW_FALSE;
     }
 
+    CFStringRef* kPropertyInputSourceID =
+        CFBundleGetDataPointerForName(_glfw.ns.tis.bundle,
+                                      CFSTR("kTISPropertyInputSourceID"));
     CFStringRef* kPropertyUnicodeKeyLayoutData =
         CFBundleGetDataPointerForName(_glfw.ns.tis.bundle,
                                       CFSTR("kTISPropertyUnicodeKeyLayoutData"));
+    _glfw.ns.tis.CopyCurrentKeyboardInputSource =
+        CFBundleGetFunctionPointerForName(_glfw.ns.tis.bundle,
+                                          CFSTR("TISCopyCurrentKeyboardInputSource"));
     _glfw.ns.tis.CopyCurrentKeyboardLayoutInputSource =
         CFBundleGetFunctionPointerForName(_glfw.ns.tis.bundle,
                                           CFSTR("TISCopyCurrentKeyboardLayoutInputSource"));
+    _glfw.ns.tis.CreateASCIICapableInputSourceList =
+        CFBundleGetFunctionPointerForName(_glfw.ns.tis.bundle,
+                                          CFSTR("TISCreateASCIICapableInputSourceList"));
+    _glfw.ns.tis.CreateInputSourceList =
+        CFBundleGetFunctionPointerForName(_glfw.ns.tis.bundle,
+                                          CFSTR("TISCreateInputSourceList"));
     _glfw.ns.tis.GetInputSourceProperty =
         CFBundleGetFunctionPointerForName(_glfw.ns.tis.bundle,
                                           CFSTR("TISGetInputSourceProperty"));
+    _glfw.ns.tis.SelectInputSource =
+        CFBundleGetFunctionPointerForName(_glfw.ns.tis.bundle,
+                                          CFSTR("TISSelectInputSource"));
     _glfw.ns.tis.GetKbdType =
         CFBundleGetFunctionPointerForName(_glfw.ns.tis.bundle,
                                           CFSTR("LMGetKbdType"));
 
-    if (!kPropertyUnicodeKeyLayoutData ||
+    if (!kPropertyInputSourceID ||
+        !kPropertyUnicodeKeyLayoutData ||
+        !TISCopyCurrentKeyboardInputSource ||
         !TISCopyCurrentKeyboardLayoutInputSource ||
+        !TISCreateASCIICapableInputSourceList ||
+        !TISCreateInputSourceList ||
         !TISGetInputSourceProperty ||
+        !TISSelectInputSource ||
         !LMGetKbdType)
     {
         _glfwInputError(GLFW_PLATFORM_ERROR,
@@ -374,6 +394,8 @@ static GLFWbool initializeTIS(void)
         return GLFW_FALSE;
     }
 
+    _glfw.ns.tis.kPropertyInputSourceID =
+        *kPropertyInputSourceID;
     _glfw.ns.tis.kPropertyUnicodeKeyLayoutData =
         *kPropertyUnicodeKeyLayoutData;
 

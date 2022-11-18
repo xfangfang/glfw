@@ -2013,9 +2013,8 @@ void _glfwSetIMEStatusCocoa(_GLFWwindow* window, int active)
         NSString* asciiSourceID =
             (__bridge NSString *) TISGetInputSourceProperty(asciiSource,
                                                             kTISPropertyInputSourceID);
-        int i;
         int count = [allInputSources count];
-        for (i = 0; i < count; i++)
+        for (int i = 0; i < count; i++)
         {
             TISInputSourceRef source =
                 (__bridge TISInputSourceRef) [allInputSources objectAtIndex:i];
@@ -2037,16 +2036,17 @@ void _glfwSetIMEStatusCocoa(_GLFWwindow* window, int active)
 
 int _glfwGetIMEStatusCocoa(_GLFWwindow* window)
 {
-    TISInputSourceRef currentSource = TISCopyCurrentKeyboardInputSource();
-    NSString* currentSourceID =
-        (__bridge NSString *) TISGetInputSourceProperty(currentSource,
-                                                        kTISPropertyInputSourceID);
     NSArray* asciiInputSources =
         CFBridgingRelease(TISCreateASCIICapableInputSourceList());
     TISInputSourceRef asciiSource =
         (__bridge TISInputSourceRef) [asciiInputSources firstObject];
     if (asciiSource)
     {
+        TISInputSourceRef currentSource = TISCopyCurrentKeyboardInputSource();
+        NSString* currentSourceID =
+            (__bridge NSString *) TISGetInputSourceProperty(currentSource,
+                                                            kTISPropertyInputSourceID);
+        CFRelease(currentSource);
         NSString* asciiSourceID =
             (__bridge NSString *) TISGetInputSourceProperty(asciiSource,
                                                             kTISPropertyInputSourceID);

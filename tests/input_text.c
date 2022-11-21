@@ -29,10 +29,22 @@
 //
 // Currently, it is made for Japanese input only.
 // You have to select the correct font to display Japanese texts.
-// You can set TTF_FONT_FILEPATH to set default font or you can choose a font by GUI
-// if fontconfig libary is enabled in X11 or Wayland.
-//
 // To handle other languages, you need to add correct ranges to nk_font_config.
+// 
+// On X11 or Wayland, you can choose a font by GUI if "fontconfig" libarary is enabled.
+// 
+// On Win32, "Yu Mincho" is selected by default if it is installed. This font is
+// included in the FOD packages, so it will be installed automatically when you
+// enable Japanese input on your environment, or you can install it by
+// "Manage optional features" in "Apps & features".
+// Refer: https://learn.microsoft.com/en-us/typography/fonts/windows_10_font_list#japanese-supplemental-fonts
+// 
+// On macOS, "Arial Unicode MS" is selected by default if it is installed.
+// I assume that this font is usually installed, but if it is not installed,
+// please install it manually.
+// 
+// You can also specify a TTF filepath and use your own favorite font by setting
+// TTF_FONT_FILEPATH below.
 //
 //========================================================================
 
@@ -278,6 +290,18 @@ static void load_default_font_for_each_platform()
 
     if (glfwGetPlatform() == GLFW_PLATFORM_COCOA)
         hasSucceeded = add_font("Arial Unicode MS", "/Library/Fonts/Arial Unicode.ttf", GLFW_TRUE);
+    else if(glfwGetPlatform() == GLFW_PLATFORM_WIN32)
+    {
+        // Use "Yu Mincho" since it is the only TTF for Japanese in the FOD packages on Windows10 and Windows11.
+        // https://learn.microsoft.com/en-us/typography/fonts/windows_10_font_list#japanese-supplemental-fonts
+        char filepath[MAX_FONT_FILEPATH_LEN];
+        char* winDir = getenv("systemroot");
+        if (winDir)
+            snprintf(filepath, MAX_FONT_FILEPATH_LEN, "%s\\Fonts\\Yumin.ttf", winDir);
+        else
+            strcpy(filepath, "C:\\Windows\\Fonts\\Yumin.ttf");
+        hasSucceeded = add_font("Yu Mincho Regular", filepath, GLFW_TRUE);
+    }
 
     if (hasSucceeded)
         currentFontIndex = fontNum - 1;
@@ -295,13 +319,13 @@ static void init_font_list()
     fontFilePaths[0] = "";
     fontNum++;
 
-    load_default_font_for_each_platform();
-
 #if defined(TTF_FONT_FILEPATH)
     useCustomFont = load_custom_font();
     if (useCustomFont)
         customFontIndex = fontNum - 1;
 #endif
+
+    load_default_font_for_each_platform();
 
 #if defined(FONTCONFIG_ENABLED)
     load_font_list_by_fontconfig();

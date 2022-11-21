@@ -144,60 +144,79 @@ static size_t encode_utf8(char* s, unsigned int ch)
     return count;
 }
 
-#if (!defined(FONTCONFIG_ENABLED) || defined(TTF_FONT_FILEPATH))
-static void init_font_list()
+static int add_font(const char* familyName, const char* ttfFilePath, int checkExistence)
 {
-    fontFamilyNames = (char**) malloc(sizeof(char*) * MAX_FONTS_LEN);
-    fontFilePaths = (char**) malloc(sizeof(char*) * MAX_FONTS_LEN);
+    if (MAX_FONTS_LEN <= fontNum)
+        return GLFW_FALSE;
 
-    fontFamilyNames[0] = "GLFW default";
-    fontFilePaths[0] = "";
+    if (MAX_FONT_FAMILY_NAME_LEN <= strlen(familyName) || MAX_FONT_FILEPATH_LEN <= strlen(ttfFilePath))
+        return GLFW_FALSE;
+
+    if (checkExistence)
+    {
+        FILE* fp = fopen(ttfFilePath, "rb");
+        if (!fp)
+            return GLFW_FALSE;
+    }
+
+    fontFamilyNames[fontNum] = (char*) malloc(sizeof(char) * (1 + strlen(familyName)));
+    strcpy(fontFamilyNames[fontNum], familyName);
+
+    fontFilePaths[fontNum] = (char*) malloc(sizeof(char) * (1 + strlen(ttfFilePath)));
+    strcpy(fontFilePaths[fontNum], ttfFilePath);
+
     fontNum++;
 
-#if defined(TTF_FONT_FILEPATH)
-    if (TTF_FONT_FILEPATH && *TTF_FONT_FILEPATH)
-    {
-        fontFilePaths[fontNum] = TTF_FONT_FILEPATH;
-        fontFamilyNames[fontNum] = "Custom";
-    }
-    else
-#endif
-    if (glfwGetPlatform() == GLFW_PLATFORM_COCOA)
-    {
-        fontFilePaths[fontNum] = "/Library/Fonts/Arial Unicode.ttf";
-        fontFamilyNames[fontNum] = "Arial Unicode MS";
-    }
-    else
-    {
-        fontFilePaths[fontNum] = NULL;
-    }
-    if (fontFilePaths[fontNum])
-    {
-        FILE *fp = fopen(fontFilePaths[fontNum], "rb");
-        if (fp)
-        {
-            currentFontIndex = fontNum;
-            fontNum++;
-            fclose(fp);
-        }
-    }
+    return GLFW_TRUE;
 }
-#else
-static void init_font_list()
+
+static int replace_font(int index, const char* familyName, const char* ttfFilePath, int checkExistence)
+{
+    if (index == 0 || fontNum <= index)
+        return GLFW_FALSE;
+    if (MAX_FONT_FAMILY_NAME_LEN <= strlen(familyName) || MAX_FONT_FILEPATH_LEN <= strlen(ttfFilePath))
+        return GLFW_FALSE;
+
+    if (checkExistence)
+    {
+        FILE* fp = fopen(ttfFilePath, "rb");
+        if (!fp)
+            return GLFW_FALSE;
+    }
+
+    free(fontFamilyNames[index]);
+    free(fontFilePaths[index]);
+
+    fontFamilyNames[index] = (char*) malloc(sizeof(char) * (1 + strlen(familyName)));
+    strcpy(fontFamilyNames[index], familyName);
+
+    fontFilePaths[index] = (char*) malloc(sizeof(char) * (1 + strlen(ttfFilePath)));
+    strcpy(fontFilePaths[index], ttfFilePath);
+
+    return GLFW_TRUE;
+}
+
+#if defined(TTF_FONT_FILEPATH)
+static int load_custom_font()
+{
+    if (MAX_FONTS_LEN <= fontNum)
+        return GLFW_FALSE;
+    if (!(TTF_FONT_FILEPATH && *TTF_FONT_FILEPATH))
+        return GLFW_FALSE;
+
+    return add_font("Custom", TTF_FONT_FILEPATH, GLFW_TRUE);
+}
+#endif
+
+#if defined(FONTCONFIG_ENABLED)
+static void load_font_list_by_fontconfig()
 {
     FcConfig* config = FcInitLoadConfigAndFonts();
     FcFontSet* fontset = FcConfigGetFonts(config, FcSetSystem);
 
-    fontFamilyNames = (char**) malloc(sizeof(char*) * MAX_FONTS_LEN);
-    fontFilePaths = (char**) malloc(sizeof(char*) * MAX_FONTS_LEN);
-
-    fontFamilyNames[0] = "GLFW default";
-    fontFilePaths[0] = "";
-    fontNum++;
-
     if (!fontset)
     {
-        printf("init_font_list failed.\n");
+        printf("load_font_list_by_fontconfig failed.\n");
         FcConfigDestroy(config);
         return;
     }
@@ -231,33 +250,12 @@ static void init_font_list()
 
                 if (existsFamily)
                 {
+                    // Prefer "regular" to the others.
                     if (strstr(filePath, "regular") || strstr(filePath, "Regular"))
-                    {
-                        if (strlen(familyName) < MAX_FONT_FAMILY_NAME_LEN && strlen(filePath) < MAX_FONT_FILEPATH_LEN)
-                        {
-                            free(fontFamilyNames[existingIndex]);
-                            fontFamilyNames[existingIndex] = (char*) malloc(sizeof(char) * (1 + strlen(familyName)));
-                            strcpy(fontFamilyNames[existingIndex], familyName);
-
-                            free(fontFilePaths[existingIndex]);
-                            fontFilePaths[existingIndex] = (char*) malloc(sizeof(char) * (1 + strlen(filePath)));
-                            strcpy(fontFilePaths[existingIndex], filePath);
-                        }
-                    }
+                        replace_font(existingIndex, familyName, filePath, GLFW_FALSE);
                 }
                 else
-                {
-                    if (strlen(familyName) < MAX_FONT_FAMILY_NAME_LEN && strlen(filePath) < MAX_FONT_FILEPATH_LEN)
-                    {
-                        fontFamilyNames[fontNum] = (char*) malloc(sizeof(char) * (1 + strlen(familyName)));
-                        strcpy(fontFamilyNames[fontNum], familyName);
-
-                        fontFilePaths[fontNum] = (char*) malloc(sizeof(char) * (1 + strlen(filePath)));
-                        strcpy(fontFilePaths[fontNum], filePath);
-
-                        fontNum++;
-                    }
-                }
+                    add_font(familyName, filePath, GLFW_FALSE);
 
                 if (MAX_FONTS_LEN <= fontNum)
                 {
@@ -272,15 +270,55 @@ static void init_font_list()
 }
 #endif
 
+static void load_default_font_for_each_platform()
+{
+    int hasSucceeded = GLFW_FALSE;
+    if (MAX_FONTS_LEN <= fontNum)
+        return;
+
+    if (glfwGetPlatform() == GLFW_PLATFORM_COCOA)
+        hasSucceeded = add_font("Arial Unicode MS", "/Library/Fonts/Arial Unicode.ttf", GLFW_TRUE);
+
+    if (hasSucceeded)
+        currentFontIndex = fontNum - 1;
+}
+
+static void init_font_list()
+{
+    int useCustomFont = GLFW_FALSE;
+    int customFontIndex = 0;
+
+    fontFamilyNames = (char**) malloc(sizeof(char*) * MAX_FONTS_LEN);
+    fontFilePaths = (char**) malloc(sizeof(char*) * MAX_FONTS_LEN);
+
+    fontFamilyNames[0] = "GLFW default";
+    fontFilePaths[0] = "";
+    fontNum++;
+
+    load_default_font_for_each_platform();
+
+#if defined(TTF_FONT_FILEPATH)
+    useCustomFont = load_custom_font();
+    if (useCustomFont)
+        customFontIndex = fontNum - 1;
+#endif
+
+#if defined(FONTCONFIG_ENABLED)
+    load_font_list_by_fontconfig();
+#endif
+
+    if (useCustomFont)
+        currentFontIndex = customFontIndex;
+}
+
 static void deinit_font_list()
 {
-#if !(!defined(FONTCONFIG_ENABLED) || defined(TTF_FONT_FILEPATH))
     for (int i = 1; i < fontNum; ++i)
     {
         free(fontFamilyNames[i]);
         free(fontFilePaths[i]);
     }
-#endif
+
     free(fontFamilyNames);
     free(fontFilePaths);
 }

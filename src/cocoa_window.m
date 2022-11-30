@@ -1986,7 +1986,7 @@ const char* _glfwGetClipboardStringCocoa(void)
     } // autoreleasepool
 }
 
-void _glfwUpdatePreeditCursorPosCocoa(_GLFWwindow* window)
+void _glfwUpdatePreeditCursorRectangleCocoa(_GLFWwindow* window)
 {
     // Do nothing. Instead, implement `firstRectForCharacterRange` callback
     // to update the position.

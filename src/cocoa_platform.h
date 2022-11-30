@@ -285,7 +285,7 @@ void _glfwSetCursorCocoa(_GLFWwindow* window, _GLFWcursor* cursor);
 void _glfwSetClipboardStringCocoa(const char* string);
 const char* _glfwGetClipboardStringCocoa(void);
 
-void _glfwUpdatePreeditCursorPosCocoa(_GLFWwindow* window);
+void _glfwUpdatePreeditCursorRectangleCocoa(_GLFWwindow* window);
 void _glfwResetPreeditTextCocoa(_GLFWwindow* window);
 void _glfwSetIMEStatusCocoa(_GLFWwindow* window, int active);
 int _glfwGetIMEStatusCocoa(_GLFWwindow* window);

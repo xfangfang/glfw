@@ -246,7 +246,7 @@ and applications don't need to draw it.  So the preedit callback described below
 work on X11.
 
 In both styles, applications should manage the position of the candidate window by using
-@ref glfwSetPreeditCursorPos.
+@ref glfwSetPreeditCursorRectangle.
 
 @note
 @x11 You can use on-the-spot style also on X11 by using @ref init_hints_x11.  In this case,
@@ -319,13 +319,15 @@ The following is an example on Win32.
 - ...
 - "|あいうえお" (caret: 0)
 
-GLFW provides helper functions to teach the suitable position of the candidate window
-to the window system.  The window system decides the best position from text cursor
-geometry (x, y coords and height).
+The application has to manage the position of the candidate window that shows
+the preedit candidate list.  To do this, the application has to manage the area
+of the preedit text cursor by the following functions.  The IME displays the
+candidate window in the appropriate position based on the area of the preedit
+text cursor.
 
 @code
-glfwSetPreeditCursorPos(window, x, y, h);
-glfwGetPreeditCursorPos(window, &x, &y, &h);
+glfwSetPreeditCursorRectangle(window, x, y, w, h);
+glfwGetPreeditCursorRectangle(window, &x, &y, &w, &h);
 @endcode
 
 Sometimes IME task is interrupted by user or application.  There are several functions

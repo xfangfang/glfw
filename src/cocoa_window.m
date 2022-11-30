@@ -791,6 +791,7 @@ static const NSRange kEmptyRange = { NSNotFound, 0 };
 {
     int x = window->preedit.cursorPosX;
     int y = window->preedit.cursorPosY;
+    int w = window->preedit.cursorWidth;
     int h = window->preedit.cursorHeight;
 
     const NSRect frame =
@@ -798,7 +799,7 @@ static const NSRange kEmptyRange = { NSNotFound, 0 };
 
     return NSMakeRect(frame.origin.x + x,
                       frame.origin.y + frame.size.height - y,
-                      0.0,
+                      w,
                       h);
 }
 

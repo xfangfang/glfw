@@ -451,30 +451,32 @@ static void set_ime_buttons(GLFWwindow* window, struct nk_context* nk, int heigh
 
 static void set_preedit_cursor_edit(GLFWwindow* window, struct nk_context* nk, int height, int* isAutoUpdating)
 {
-    static int lastX = -1, lastY = -1, lastH = -1;
-    static char xBuf[12] = "", yBuf[12] = "", hBuf[12] = "";
+    static int lastX = -1, lastY = -1, lastW = -1, lastH = -1;
+    static char xBuf[12] = "", yBuf[12] = "", wBuf[12] = "", hBuf[12] = "";
 
     const nk_flags flags = NK_EDIT_FIELD |
                            NK_EDIT_SIG_ENTER |
                            NK_EDIT_GOTO_END_ON_ACTIVATE;
     nk_flags events;
-    int x, y, h;
+    int x, y, w, h;
 
-    glfwGetPreeditCursorPos(window, &x, &y, &h);
+    glfwGetPreeditCursorRectangle(window, &x, &y, &w, &h);
 
     if (x != lastX)
         sprintf(xBuf, "%i", x);
     if (y != lastY)
         sprintf(yBuf, "%i", y);
+    if (w != lastW)
+        sprintf(wBuf, "%i", w);
     if (h != lastH)
         sprintf(hBuf, "%i", h);
 
     nk_layout_row_begin(nk, NK_DYNAMIC, height, 5);
 
-    nk_layout_row_push(nk, 4.f / 8.f);
-    nk_label(nk, "Preedit cursor (x,y,h)", NK_TEXT_LEFT);
+    nk_layout_row_push(nk, 4.f / 9.f);
+    nk_label(nk, "Preedit cursor (x,y,w,h)", NK_TEXT_LEFT);
 
-    nk_layout_row_push(nk, 1.f / 8.f);
+    nk_layout_row_push(nk, 1.f / 9.f);
     events = nk_edit_string_zero_terminated(nk, flags, xBuf,
                                             sizeof(xBuf),
                                             nk_filter_decimal);
@@ -482,12 +484,12 @@ static void set_preedit_cursor_edit(GLFWwindow* window, struct nk_context* nk, i
     {
         x = atoi(xBuf);
         *isAutoUpdating = GLFW_FALSE;
-        glfwSetPreeditCursorPos(window, x, y, h);
+        glfwSetPreeditCursorRectangle(window, x, y, w, h);
     }
     else if (events & NK_EDIT_DEACTIVATED)
         sprintf(xBuf, "%i", x);
 
-    nk_layout_row_push(nk, 1.f / 8.f);
+    nk_layout_row_push(nk, 1.f / 9.f);
     events = nk_edit_string_zero_terminated(nk, flags, yBuf,
                                             sizeof(yBuf),
                                             nk_filter_decimal);
@@ -495,12 +497,25 @@ static void set_preedit_cursor_edit(GLFWwindow* window, struct nk_context* nk, i
     {
         y = atoi(yBuf);
         *isAutoUpdating = GLFW_FALSE;
-        glfwSetPreeditCursorPos(window, x, y, h);
+        glfwSetPreeditCursorRectangle(window, x, y, w, h);
     }
     else if (events & NK_EDIT_DEACTIVATED)
         sprintf(yBuf, "%i", y);
 
-    nk_layout_row_push(nk, 1.f / 8.f);
+    nk_layout_row_push(nk, 1.f / 9.f);
+    events = nk_edit_string_zero_terminated(nk, flags, wBuf,
+                                            sizeof(wBuf),
+                                            nk_filter_decimal);
+    if (events & NK_EDIT_COMMITED)
+    {
+        w = atoi(wBuf);
+        *isAutoUpdating = GLFW_FALSE;
+        glfwSetPreeditCursorRectangle(window, x, y, w, h);
+    }
+    else if (events & NK_EDIT_DEACTIVATED)
+        sprintf(wBuf, "%i", w);
+
+    nk_layout_row_push(nk, 1.f / 9.f);
     events = nk_edit_string_zero_terminated(nk, flags, hBuf,
                                             sizeof(hBuf),
                                             nk_filter_decimal);
@@ -508,18 +523,19 @@ static void set_preedit_cursor_edit(GLFWwindow* window, struct nk_context* nk, i
     {
         h = atoi(hBuf);
         *isAutoUpdating = GLFW_FALSE;
-        glfwSetPreeditCursorPos(window, x, y, h);
+        glfwSetPreeditCursorRectangle(window, x, y, w, h);
     }
     else if (events & NK_EDIT_DEACTIVATED)
         sprintf(hBuf, "%i", h);
 
-    nk_layout_row_push(nk, 1.f / 8.f);
+    nk_layout_row_push(nk, 1.f / 9.f);
     nk_checkbox_label(nk, "Auto", isAutoUpdating);
 
     nk_layout_row_end(nk);
 
     lastX = x;
     lastY = y;
+    lastW = w;
     lastH = h;
 }
 
@@ -546,7 +562,7 @@ static void set_preedit_labels(GLFWwindow* window, struct nk_context* nk, int he
 // we can set preedit-cursor position more easily.
 // However, there doesn't seem to be a way to do that, so this does a simplified calculation only for the end
 // of the text. (Can not trace the cursor movement)
-static void update_preedit_pos(GLFWwindow* window, struct nk_context* nk, struct nk_user_font* f, char* boxBuffer, int boxLen)
+static void update_cursor_pos(GLFWwindow* window, struct nk_context* nk, struct nk_user_font* f, char* boxBuffer, int boxLen)
 {
     float lineWidth = 0;
     int totalLines = 1;
@@ -586,10 +602,17 @@ static void update_preedit_pos(GLFWwindow* window, struct nk_context* nk, struct
         int widgetLayoutX = 10;
         int widgetLayoutY = 220;
 
-        int preeditPosX = widgetLayoutX + lineWidth;
-        int preeditPosY = widgetLayoutY + totalLines * (f->height + nk->style.edit.row_padding);
+        int lineHeight = f->height + nk->style.edit.row_padding;
 
-        glfwSetPreeditCursorPos(window, preeditPosX, preeditPosY, 0);
+        int cursorPosX = widgetLayoutX + lineWidth;
+        int cursorPosY = widgetLayoutY + lineHeight * (totalLines - 1);
+        int cursorHeight = lineHeight;
+        int cursorWidth;
+
+        // Keep the value of width since it doesn't need to be updated.
+        glfwGetPreeditCursorRectangle(window, NULL, NULL, &cursorWidth, NULL);
+
+        glfwSetPreeditCursorRectangle(window, cursorPosX, cursorPosY, cursorWidth, cursorHeight);
     }
 }
 
@@ -662,7 +685,7 @@ int main(int argc, char** argv)
     int width, height;
     char boxBuffer[MAX_BUFFER_LEN] = "Input text here.\nここに入力してください。";
     int boxLen = strlen(boxBuffer);
-    int isAutoUpdatingPreeditPosEnabled = GLFW_TRUE;
+    int isAutoUpdatingCursorPosEnabled = GLFW_TRUE;
     int ch;
 
     while ((ch = getopt(argc, argv, "hs")) != -1)
@@ -695,6 +718,7 @@ int main(int argc, char** argv)
     }
 
     currentIMEStatus = glfwGetInputMode(window, GLFW_IME);
+    glfwSetPreeditCursorRectangle(window, 0, 0, 1, 1);
     glfwSetIMEStatusCallback(window, ime_callback);
     glfwSetPreeditCallback(window, preedit_callback);
 
@@ -722,7 +746,7 @@ int main(int argc, char** argv)
             if (set_font_selecter(window, nk, 30, 18))
                 update_font(nk, 18);
             set_ime_buttons(window, nk, 30);
-            set_preedit_cursor_edit(window, nk, 30, &isAutoUpdatingPreeditPosEnabled);
+            set_preedit_cursor_edit(window, nk, 30, &isAutoUpdatingCursorPosEnabled);
             set_ime_stauts_labels(window, nk, 30);
             set_preedit_labels(window, nk, 30);
 
@@ -735,8 +759,8 @@ int main(int argc, char** argv)
         nk_glfw3_render(NK_ANTI_ALIASING_ON);
         glfwSwapBuffers(window);
 
-        if (isAutoUpdatingPreeditPosEnabled)
-            update_preedit_pos(window, nk, &currentFont->handle, boxBuffer, boxLen);
+        if (isAutoUpdatingCursorPosEnabled)
+            update_cursor_pos(window, nk, &currentFont->handle, boxBuffer, boxLen);
 
         glfwWaitEvents();
     }

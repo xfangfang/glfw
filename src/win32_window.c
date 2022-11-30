@@ -2598,7 +2598,7 @@ const char* _glfwGetClipboardStringWin32(void)
     return _glfw.win32.clipboardString;
 }
 
-void _glfwUpdatePreeditCursorPosWin32(_GLFWwindow* window)
+void _glfwUpdatePreeditCursorRectangleWin32(_GLFWwindow* window)
 {
     _GLFWpreedit* preedit = &window->preedit;
     HWND hWnd = window->win32.handle;
@@ -2606,8 +2606,9 @@ void _glfwUpdatePreeditCursorPosWin32(_GLFWwindow* window)
 
     int x = preedit->cursorPosX;
     int y = preedit->cursorPosY;
+    int w = preedit->cursorWidth;
     int h = preedit->cursorHeight;
-    CANDIDATEFORM excludeRect = { 0, CFS_EXCLUDE, { x, y }, { x, y, x, y + h } };
+    CANDIDATEFORM excludeRect = { 0, CFS_EXCLUDE, { x, y }, { x, y, x + w, y + h } };
 
     ImmSetCandidateWindow(hIMC, &excludeRect);
 

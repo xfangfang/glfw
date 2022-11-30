@@ -574,20 +574,19 @@ static GLFWbool getImmPreedit(_GLFWwindow* window)
 
     if (preeditBytes > 0)
     {
-        int i;
-        uint32_t codepoint;
-        WCHAR highSurrogate = 0;
         int textBufferCount = preedit->textBufferCount;
         int blockBufferCount = preedit->blockSizesBufferCount;
         int textLen = preeditBytes / sizeof(WCHAR);
         LPWSTR buffer = _glfw_calloc(preeditBytes, 1);
         LPSTR attributes = _glfw_calloc(attrBytes, 1);
-        DWORD *clauses = _glfw_calloc(clauseBytes, 1);
+        DWORD* clauses = _glfw_calloc(clauseBytes, 1);
 
         // get preedit data
         ImmGetCompositionStringW(hIMC, GCS_COMPSTR, buffer, preeditBytes);
-        ImmGetCompositionStringW(hIMC, GCS_COMPATTR, attributes, attrBytes);
-        ImmGetCompositionStringW(hIMC, GCS_COMPCLAUSE, clauses, clauseBytes);
+        if (attributes)
+            ImmGetCompositionStringW(hIMC, GCS_COMPATTR, attributes, attrBytes);
+        if (clauses)
+            ImmGetCompositionStringW(hIMC, GCS_COMPCLAUSE, clauses, clauseBytes);
 
         // store preedit text
         while (textBufferCount < textLen + 1)
@@ -611,7 +610,7 @@ static GLFWbool getImmPreedit(_GLFWwindow* window)
         }
 
         // store blocks
-        preedit->blockSizesCount = clauseBytes / sizeof(DWORD) - 1;
+        preedit->blockSizesCount = clauses ? clauseBytes / sizeof(DWORD) - 1 : 1;
         while (blockBufferCount < preedit->blockSizesCount)
             blockBufferCount = (blockBufferCount == 0) ? 1 : blockBufferCount * 2;
         if (blockBufferCount != preedit->blockSizesBufferCount)
@@ -632,28 +631,24 @@ static GLFWbool getImmPreedit(_GLFWwindow* window)
             preedit->blockSizesBufferCount = blockBufferCount;
         }
 
-        for (i = 0; i < preedit->blockSizesCount; i++)
-        {
-            if (attributes[clauses[i]] != ATTR_CONVERTED)
-            {
-                preedit->focusedBlockIndex = i;
-                break;
-            }
-        }
-
         {
             // Win32 API handles text data in UTF16, so we have to convert them
             // to UTF32. Not only the encoding, but also the number of characters,
             // the position of each block and the cursor.
+            uint32_t codepoint;
+            WCHAR highSurrogate = 0;
             int convertedLength = 0;
             int blockIndex = 0;
             int currentBlockLength = 0;
+
             // The last element of clauses is a block count, but
             // text length is convenient.
-            clauses[preedit->blockSizesCount] = textLen;
-            for (i = 0; i < textLen; i++)
+            if (clauses)
+                clauses[preedit->blockSizesCount] = textLen;
+
+            for (int i = 0; i < textLen; i++)
             {
-                if (clauses[blockIndex + 1] <= (DWORD) i)
+                if (clauses && clauses[blockIndex + 1] <= (DWORD) i)
                 {
                     preedit->blockSizes[blockIndex++] = currentBlockLength;
                     currentBlockLength = 0;
@@ -677,6 +672,19 @@ static GLFWbool getImmPreedit(_GLFWwindow* window)
             preedit->textCount = convertedLength;
             preedit->text[convertedLength] = 0;
             preedit->caretIndex = cursorPos;
+
+            preedit->focusedBlockIndex = 0;
+            if (attributes && clauses)
+            {
+                for (int i = 0; i < preedit->blockSizesCount; i++)
+                {
+                    if (attributes[clauses[i]] != ATTR_CONVERTED)
+                    {
+                        preedit->focusedBlockIndex = i;
+                        break;
+                    }
+                }
+            }
         }
 
         _glfw_free(buffer);

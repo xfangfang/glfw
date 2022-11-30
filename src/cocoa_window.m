@@ -798,7 +798,8 @@ static const NSRange kEmptyRange = { NSNotFound, 0 };
         [window->ns.object contentRectForFrameRect:[window->ns.object frame]];
 
     return NSMakeRect(frame.origin.x + x,
-                      frame.origin.y + frame.size.height - y,
+                      // The y-axis is upward on macOS, so this conversion is needed.
+                      frame.origin.y + frame.size.height - y - h,
                       w,
                       h);
 }

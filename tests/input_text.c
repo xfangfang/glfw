@@ -683,7 +683,7 @@ int main(int argc, char** argv)
     GLFWwindow* window;
     struct nk_context* nk;
     int width, height;
-    char boxBuffer[MAX_BUFFER_LEN] = "Input text here.\nここに入力してください。";
+    char boxBuffer[MAX_BUFFER_LEN] = "Input text here.";
     int boxLen = strlen(boxBuffer);
     int isAutoUpdatingCursorPosEnabled = GLFW_TRUE;
     int ch;

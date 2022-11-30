@@ -5100,7 +5100,7 @@ GLFWAPI void glfwSetCursor(GLFWwindow* window, GLFWcursor* cursor);
  *  @par Thread Safety
  *  This function may only be called from the main thread.
  *
- *  @sa @ref input_char
+ *  @sa @ref preedit
  *
  *  @since Added in GLFW 3.X.
  *
@@ -5122,7 +5122,7 @@ GLFWAPI void glfwGetPreeditCursorRectangle(GLFWwindow* window, int* x, int* y, i
  *  @par Thread Safety
  *  This function may only be called from the main thread.
  *
- *  @sa @ref input_char
+ *  @sa @ref preedit
  *
  *  @since Added in GLFW 3.X.
  *
@@ -5321,7 +5321,7 @@ GLFWAPI GLFWcharmodsfun glfwSetCharModsCallback(GLFWwindow* window, GLFWcharmods
  *  @par Thread Safety
  *  This function may only be called from the main thread.
  *
- *  @sa @ref input_char
+ *  @sa @ref preedit
  *
  *  @since Added in GLFW 3.X
  *
@@ -5352,7 +5352,7 @@ GLFWAPI GLFWpreeditfun glfwSetPreeditCallback(GLFWwindow* window, GLFWpreeditfun
  *  @par Thread Safety
  *  This function may only be called from the main thread.
  *
- *  @sa @ref input_char
+ *  @sa @ref preedit
  *
  *  @since Added in GLFW 3.X
  *

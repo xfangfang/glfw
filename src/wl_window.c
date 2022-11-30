@@ -1866,7 +1866,8 @@ static void textInputV3PreeditString(void* data,
         {
             int bufSize = preedit->textBufferCount;
 
-            bufSize = (bufSize == 0) ? 1 : bufSize * 2;
+            while (bufSize < preedit->textCount + 1)
+                bufSize = (bufSize == 0) ? 1 : bufSize * 2;
             preedit->text = _glfw_realloc(preedit->text,
                                           sizeof(unsigned int) * bufSize);
             preedit->textBufferCount = bufSize;

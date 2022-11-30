@@ -1933,7 +1933,7 @@ static void textInputV3Done(void* data,
                             uint32_t serial)
 {
     _GLFWwindow* window = (_GLFWwindow*) data;
-    _glfwUpdatePreeditCursorPosWayland(window);
+    _glfwUpdatePreeditCursorRectangleWayland(window);
     _glfwInputPreedit(window);
 }
 
@@ -3171,20 +3171,21 @@ const char* _glfwGetClipboardStringWayland(void)
     return _glfw.wl.clipboardString;
 }
 
-void _glfwUpdatePreeditCursorPosWayland(_GLFWwindow* window)
+void _glfwUpdatePreeditCursorRectangleWayland(_GLFWwindow* window)
 {
     _GLFWpreedit* preedit = &window->preedit;
     int x = preedit->cursorPosX;
     int y = preedit->cursorPosY;
+    int w = preedit->cursorWidth;
     int h = preedit->cursorHeight;
 
     if (window->wl.textInputV3)
     {
-        zwp_text_input_v3_set_cursor_rectangle(window->wl.textInputV3, x, y, 0, h);
+        zwp_text_input_v3_set_cursor_rectangle(window->wl.textInputV3, x, y, w, h);
         zwp_text_input_v3_commit(window->wl.textInputV3);
     }
     else if (window->wl.textInputV1)
-        zwp_text_input_v1_set_cursor_rectangle(window->wl.textInputV1, x, y, 0, h);
+        zwp_text_input_v1_set_cursor_rectangle(window->wl.textInputV1, x, y, w, h);
 }
 
 void _glfwResetPreeditTextWayland(_GLFWwindow* window)

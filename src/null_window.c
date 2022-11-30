@@ -551,7 +551,7 @@ const char* _glfwGetClipboardStringNull(void)
     return _glfw.null.clipboardString;
 }
 
-void _glfwUpdatePreeditCursorPosNull(_GLFWwindow* window)
+void _glfwUpdatePreeditCursorRectangleNull(_GLFWwindow* window)
 {
 }
 

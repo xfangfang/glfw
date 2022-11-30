@@ -529,7 +529,7 @@ struct _GLFWpreedit
     int                 blockSizesBufferCount;
     int                 focusedBlockIndex;
     int                 caretIndex;
-    int                 cursorPosX, cursorPosY, cursorHeight;
+    int                 cursorPosX, cursorPosY, cursorWidth, cursorHeight;
 };
 
 // Window and context structure
@@ -708,7 +708,7 @@ struct _GLFWplatform
     int (*getKeyScancode)(int);
     void (*setClipboardString)(const char*);
     const char* (*getClipboardString)(void);
-    void (*updatePreeditCursorPos)(_GLFWwindow*);
+    void (*updatePreeditCursorRectangle)(_GLFWwindow*);
     void (*resetPreeditText)(_GLFWwindow*);
     void (*setIMEStatus)(_GLFWwindow*,int);
     int  (*getIMEStatus)(_GLFWwindow*);

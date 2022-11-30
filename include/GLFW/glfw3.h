@@ -5086,37 +5086,16 @@ GLFWAPI void glfwDestroyCursor(GLFWcursor* cursor);
  */
 GLFWAPI void glfwSetCursor(GLFWwindow* window, GLFWcursor* cursor);
 
-/*! @brief Retrieves the position of the text cursor relative to the client area of window.
+/*! @brief Retrieves the area of the preedit text cursor.
  *
- *  This function returns position hint to decide the candidate window.
+ *  This area is used to decide the position of the candidate window.
+ *  The cursor position is relative to the window.
  *
- *  @param[in] window The window to set the text cursor for.
- *  @param[out] x The text cursor x position (relative position from window coordinates).
- *  @param[out] y The text cursor y position (relative position from window coordinates).
- *  @param[out] h The text cursor height.
- *
- *  @par Thread Safety
- *  This function may only be called from the main thread.
- *
- *  @sa @ref preedit
- *
- *  @since Added in GLFW 3.X.
- *
- *  @ingroup input
- */
-GLFWAPI void glfwGetPreeditCursorPos(GLFWwindow* window, int* x, int* y, int* h);
-
-/*! @brief Notify the text cursor position to window system to decide the candidate window position.
- *
- *  This function teach position hint to decide the candidate window.  The candidate window
- *  is a part of IME(Input Method Editor) and show several candidate strings.
- *
- *  Windows systems decide proper position from text cursor geometry.
- *
- *  @param[in] window The window to set the text cursor for.
- *  @param[in] x The text cursor x position (relative position from window coordinates).
- *  @param[in] y The text cursor y position (relative position from window coordinates).
- *  @param[in] h The text cursor height.
+ *  @param[in] window The window to set the preedit text cursor for.
+ *  @param[out] x The preedit text cursor x position (relative position from window coordinates).
+ *  @param[out] y The preedit text cursor y position (relative position from window coordinates).
+ *  @param[out] w The preedit text cursor width.
+ *  @param[out] h The preedit text cursor height.
  *
  *  @par Thread Safety
  *  This function may only be called from the main thread.
@@ -5127,9 +5106,31 @@ GLFWAPI void glfwGetPreeditCursorPos(GLFWwindow* window, int* x, int* y, int* h)
  *
  *  @ingroup input
  */
-GLFWAPI void glfwSetPreeditCursorPos(GLFWwindow* window, int x, int y, int h);
+GLFWAPI void glfwGetPreeditCursorRectangle(GLFWwindow* window, int* x, int* y, int* w, int* h);
 
-/*! @brief Reset IME input status.
+/*! @brief Sets the area of the preedit text cursor.
+ *
+ *  This area is used to decide the position of the candidate window.
+ *  The cursor position is relative to the window.
+ *
+ *  @param[in] window The window to set the text cursor for.
+ *  @param[in] x The preedit text cursor x position (relative position from window coordinates).
+ *  @param[in] y The preedit text cursor y position (relative position from window coordinates).
+ *  @param[in] h The preedit text cursor width.
+ *  @param[in] h The preedit text cursor height.
+ *
+ *  @par Thread Safety
+ *  This function may only be called from the main thread.
+ *
+ *  @sa @ref preedit
+ *
+ *  @since Added in GLFW 3.X.
+ *
+ *  @ingroup input
+ */
+GLFWAPI void glfwSetPreeditCursorRectangle(GLFWwindow* window, int x, int y, int w, int h);
+
+/*! @brief Resets IME input status.
  *
  *  This function resets IME's preedit text.
  *

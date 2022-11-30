@@ -496,7 +496,7 @@ static void preedit_callback(GLFWwindow* window, int preeditCount,
             printf("|");
         printf("\n");
         glfwGetWindowSize(window, &width, &height);
-        glfwSetPreeditCursorPos(window, width/2, height/2, 20);
+        glfwSetPreeditCursorRectangle(window, width/2, height/2, 1, 20);
     }
 }
 

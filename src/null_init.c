@@ -56,7 +56,7 @@ GLFWbool _glfwConnectNull(int platformID, _GLFWplatform* platform)
         _glfwGetKeyScancodeNull,
         _glfwSetClipboardStringNull,
         _glfwGetClipboardStringNull,
-        _glfwUpdatePreeditCursorPosNull,
+        _glfwUpdatePreeditCursorRectangleNull,
         _glfwResetPreeditTextNull,
         _glfwSetIMEStatusNull,
         _glfwGetIMEStatusNull,

@@ -973,7 +973,7 @@ GLFWAPI void glfwSetCursor(GLFWwindow* windowHandle, GLFWcursor* cursorHandle)
     _glfw.platform.setCursor(window, cursor);
 }
 
-GLFWAPI void glfwGetPreeditCursorPos(GLFWwindow* handle, int* x, int* y, int* h)
+GLFWAPI void glfwGetPreeditCursorRectangle(GLFWwindow* handle, int* x, int* y, int* w, int* h)
 {
     _GLFWwindow* window = (_GLFWwindow*) handle;
     _GLFWpreedit* preedit = &window->preedit;
@@ -981,25 +981,31 @@ GLFWAPI void glfwGetPreeditCursorPos(GLFWwindow* handle, int* x, int* y, int* h)
         *x = preedit->cursorPosX;
     if (y)
         *y = preedit->cursorPosY;
+    if (w)
+        *w = preedit->cursorWidth;
     if (h)
         *h = preedit->cursorHeight;
 }
 
-GLFWAPI void glfwSetPreeditCursorPos(GLFWwindow* handle, int x, int y, int h)
+GLFWAPI void glfwSetPreeditCursorRectangle(GLFWwindow* handle, int x, int y, int w, int h)
 {
     _GLFWwindow* window = (_GLFWwindow*) handle;
     _GLFWpreedit* preedit = &window->preedit;
 
     if (x == preedit->cursorPosX &&
         y == preedit->cursorPosY &&
+        w == preedit->cursorWidth &&
         h == preedit->cursorHeight)
+    {
         return;
+    }
 
     preedit->cursorPosX = x;
     preedit->cursorPosY = y;
+    preedit->cursorWidth = w;
     preedit->cursorHeight = h;
 
-    _glfw.platform.updatePreeditCursorPos(window);
+    _glfw.platform.updatePreeditCursorRectangle(window);
 }
 
 GLFWAPI void glfwResetPreeditText(GLFWwindow* handle)

@@ -791,14 +791,16 @@ static const NSRange kEmptyRange = { NSNotFound, 0 };
 {
     int x = window->preedit.cursorPosX;
     int y = window->preedit.cursorPosY;
+    int w = window->preedit.cursorWidth;
     int h = window->preedit.cursorHeight;
 
     const NSRect frame =
         [window->ns.object contentRectForFrameRect:[window->ns.object frame]];
 
     return NSMakeRect(frame.origin.x + x,
-                      frame.origin.y + frame.size.height - y,
-                      0.0,
+                      // The y-axis is upward on macOS, so this conversion is needed.
+                      frame.origin.y + frame.size.height - y - h,
+                      w,
                       h);
 }
 
@@ -1985,7 +1987,7 @@ const char* _glfwGetClipboardStringCocoa(void)
     } // autoreleasepool
 }
 
-void _glfwUpdatePreeditCursorPosCocoa(_GLFWwindow* window)
+void _glfwUpdatePreeditCursorRectangleCocoa(_GLFWwindow* window)
 {
     // Do nothing. Instead, implement `firstRectForCharacterRange` callback
     // to update the position.

@@ -3328,7 +3328,7 @@ const char* _glfwGetClipboardStringX11(void)
 
 // When using STYLE_ONTHESPOT, this doesn't work and the cursor position can't be updated
 //
-void _glfwUpdatePreeditCursorPosX11(_GLFWwindow* window)
+void _glfwUpdatePreeditCursorRectangleX11(_GLFWwindow* window)
 {
     XVaNestedList preedit_attr;
     XPoint spot;
@@ -3337,7 +3337,7 @@ void _glfwUpdatePreeditCursorPosX11(_GLFWwindow* window)
     if (!window->x11.ic)
         return;
 
-    spot.x = preedit->cursorPosX;
+    spot.x = preedit->cursorPosX + preedit->cursorWidth;
     spot.y = preedit->cursorPosY + preedit->cursorHeight;
     preedit_attr = XVaCreateNestedList(0, XNSpotLocation, &spot, NULL);
     XSetICValues(window->x11.ic, XNPreeditAttributes, preedit_attr, NULL);

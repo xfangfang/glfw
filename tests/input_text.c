@@ -116,8 +116,8 @@ static int fontNum = 0;
 static int currentFontIndex = 0;
 
 static int currentIMEStatus = GLFW_FALSE;
-#define MAX_PREDIT_LEN 128
-static char preeditBuf[MAX_PREDIT_LEN] = "";
+#define MAX_PREEDIT_LEN 128
+static char preeditBuf[MAX_PREEDIT_LEN] = "";
 
 void usage(void)
 {
@@ -650,38 +650,38 @@ static void preedit_callback(GLFWwindow* window, int preeditCount,
 
         if (i == caret)
         {
-            if (strlen(preeditBuf) + strlen("|") < MAX_PREDIT_LEN)
+            if (strlen(preeditBuf) + strlen("|") < MAX_PREEDIT_LEN)
                 strcat(preeditBuf, "|");
         }
         if (remainingBlockSize == 0)
         {
             if (blockIndex == focusedBlock)
             {
-                if (strlen(preeditBuf) + strlen("]") < MAX_PREDIT_LEN)
+                if (strlen(preeditBuf) + strlen("]") < MAX_PREEDIT_LEN)
                     strcat(preeditBuf, "]");
             }
             blockIndex++;
             remainingBlockSize = blockSizes[blockIndex];
             if (blockIndex == focusedBlock)
             {
-                if (strlen(preeditBuf) + strlen("[") < MAX_PREDIT_LEN)
+                if (strlen(preeditBuf) + strlen("[") < MAX_PREEDIT_LEN)
                     strcat(preeditBuf, "[");
             }
         }
         encodedCount = encode_utf8(encoded, preeditString[i]);
         encoded[encodedCount] = '\0';
-        if (strlen(preeditBuf) + strlen(encoded) < MAX_PREDIT_LEN)
+        if (strlen(preeditBuf) + strlen(encoded) < MAX_PREEDIT_LEN)
             strcat(preeditBuf, encoded);
         remainingBlockSize--;
     }
     if (blockIndex == focusedBlock)
     {
-        if (strlen(preeditBuf) + strlen("]") < MAX_PREDIT_LEN)
+        if (strlen(preeditBuf) + strlen("]") < MAX_PREEDIT_LEN)
             strcat(preeditBuf, "]");
     }
     if (caret == preeditCount)
     {
-        if (strlen(preeditBuf) + strlen("|") < MAX_PREDIT_LEN)
+        if (strlen(preeditBuf) + strlen("|") < MAX_PREEDIT_LEN)
             strcat(preeditBuf, "|");
     }
 }

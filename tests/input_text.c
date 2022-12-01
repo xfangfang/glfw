@@ -171,9 +171,11 @@ static int add_font(const char* familyName, const char* ttfFilePath, int checkEx
     }
 
     fontFamilyNames[fontNum] = (char*) malloc(sizeof(char) * (1 + strlen(familyName)));
+    assert(fontFamilyNames[fontNum]);
     strcpy(fontFamilyNames[fontNum], familyName);
 
     fontFilePaths[fontNum] = (char*) malloc(sizeof(char) * (1 + strlen(ttfFilePath)));
+    assert(fontFilePaths[fontNum]);
     strcpy(fontFilePaths[fontNum], ttfFilePath);
 
     fontNum++;
@@ -199,9 +201,11 @@ static int replace_font(int index, const char* familyName, const char* ttfFilePa
     free(fontFilePaths[index]);
 
     fontFamilyNames[index] = (char*) malloc(sizeof(char) * (1 + strlen(familyName)));
+    assert(fontFamilyNames[index]);
     strcpy(fontFamilyNames[index], familyName);
 
     fontFilePaths[index] = (char*) malloc(sizeof(char) * (1 + strlen(ttfFilePath)));
+    assert(fontFilePaths[index]);
     strcpy(fontFilePaths[index], ttfFilePath);
 
     return GLFW_TRUE;
@@ -312,7 +316,9 @@ static void init_font_list()
     int customFontIndex = 0;
 
     fontFamilyNames = (char**) malloc(sizeof(char*) * MAX_FONTS_LEN);
+    assert(fontFamilyNames);
     fontFilePaths = (char**) malloc(sizeof(char*) * MAX_FONTS_LEN);
+    assert(fontFilePaths);
 
     fontFamilyNames[0] = "GLFW default";
     fontFilePaths[0] = "";

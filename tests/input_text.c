@@ -170,11 +170,11 @@ static int add_font(const char* familyName, const char* ttfFilePath, int checkEx
             return GLFW_FALSE;
     }
 
-    fontFamilyNames[fontNum] = (char*) malloc(sizeof(char) * (1 + strlen(familyName)));
+    fontFamilyNames[fontNum] = (char*) malloc(1 + strlen(familyName));
     assert(fontFamilyNames[fontNum]);
     strcpy(fontFamilyNames[fontNum], familyName);
 
-    fontFilePaths[fontNum] = (char*) malloc(sizeof(char) * (1 + strlen(ttfFilePath)));
+    fontFilePaths[fontNum] = (char*) malloc(1 + strlen(ttfFilePath));
     assert(fontFilePaths[fontNum]);
     strcpy(fontFilePaths[fontNum], ttfFilePath);
 
@@ -200,11 +200,11 @@ static int replace_font(int index, const char* familyName, const char* ttfFilePa
     free(fontFamilyNames[index]);
     free(fontFilePaths[index]);
 
-    fontFamilyNames[index] = (char*) malloc(sizeof(char) * (1 + strlen(familyName)));
+    fontFamilyNames[index] = (char*) malloc(1 + strlen(familyName));
     assert(fontFamilyNames[index]);
     strcpy(fontFamilyNames[index], familyName);
 
-    fontFilePaths[index] = (char*) malloc(sizeof(char) * (1 + strlen(ttfFilePath)));
+    fontFilePaths[index] = (char*) malloc(1 + strlen(ttfFilePath));
     assert(fontFilePaths[index]);
     strcpy(fontFilePaths[index], ttfFilePath);
 

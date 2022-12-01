@@ -168,6 +168,7 @@ static int add_font(const char* familyName, const char* ttfFilePath, int checkEx
         FILE* fp = fopen(ttfFilePath, "rb");
         if (!fp)
             return GLFW_FALSE;
+        fclose(fp);
     }
 
     fontFamilyNames[fontNum] = (char*) malloc(1 + strlen(familyName));
@@ -195,6 +196,7 @@ static int replace_font(int index, const char* familyName, const char* ttfFilePa
         FILE* fp = fopen(ttfFilePath, "rb");
         if (!fp)
             return GLFW_FALSE;
+        fclose(fp);
     }
 
     free(fontFamilyNames[index]);

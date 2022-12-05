@@ -1870,6 +1870,8 @@ static void textInputV3PreeditString(void* data,
                 bufSize = (bufSize == 0) ? 1 : bufSize * 2;
             preedit->text = _glfw_realloc(preedit->text,
                                           sizeof(unsigned int) * bufSize);
+            if (!preedit->text)
+                return;
             preedit->textBufferCount = bufSize;
         }
         preedit->text[preedit->textCount - 1] = codepoint;
@@ -1891,6 +1893,8 @@ static void textInputV3PreeditString(void* data,
 
             preedit->blockSizesBufferCount = bufSize;
             preedit->blockSizes = _glfw_calloc(sizeof(int), bufSize);
+            if (!preedit->blockSizes)
+                return;
             blocks = preedit->blockSizes;
         }
 

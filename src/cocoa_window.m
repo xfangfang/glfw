@@ -689,8 +689,8 @@ static const NSRange kEmptyRange = { NSNotFound, 0 };
         textBufferCount = textBufferCount == 0 ? 1 : textBufferCount * 2;
     if (textBufferCount != preedit->textBufferCount)
     {
-        unsigned int* preeditText = realloc(preedit->text,
-                                            sizeof(unsigned int) * textBufferCount);
+        unsigned int* preeditText = _glfw_realloc(preedit->text,
+                                                  sizeof(unsigned int) * textBufferCount);
         if (preeditText == NULL)
             return;
         preedit->text = preeditText;
@@ -717,8 +717,8 @@ static const NSRange kEmptyRange = { NSNotFound, 0 };
         {
             int blockBufferCount = (preedit->blockSizesBufferCount == 0)
                 ? 1 : preedit->blockSizesBufferCount * 2;
-            int* blocks = realloc(preedit->blockSizes,
-                                  sizeof(int) * blockBufferCount);
+            int* blocks = _glfw_realloc(preedit->blockSizes,
+                                        sizeof(int) * blockBufferCount);
             if (blocks == NULL)
                 return;
             preedit->blockSizes = blocks;

@@ -581,6 +581,15 @@ static GLFWbool getImmPreedit(_GLFWwindow* window)
         LPSTR attributes = _glfw_calloc(attrBytes, 1);
         DWORD* clauses = _glfw_calloc(clauseBytes, 1);
 
+        if (!buffer || (attrBytes > 0 && !attributes) || (clauseBytes > 0 && !clauses))
+        {
+            _glfw_free(buffer);
+            _glfw_free(attributes);
+            _glfw_free(clauses);
+            ImmReleaseContext(window->win32.handle, hIMC);
+            return GLFW_FALSE;
+        }
+
         // get preedit data
         ImmGetCompositionStringW(hIMC, GCS_COMPSTR, buffer, preeditBytes);
         if (attributes)

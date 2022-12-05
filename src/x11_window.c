@@ -583,6 +583,7 @@ static void _ximPreeditDrawCallback(XIC xic, XPointer clientData, XIMPreeditDraw
         int i, j, rstart, rend;
         const char* src;
 
+        // realloc preedit text
         while (textBufferCount < textLen + 1)
             textBufferCount = (textBufferCount == 0) ? 1 : textBufferCount * 2;
         if (textBufferCount != preedit->textBufferCount)
@@ -597,11 +598,15 @@ static void _ximPreeditDrawCallback(XIC xic, XPointer clientData, XIMPreeditDraw
         }
         preedit->textCount = textLen;
         preedit->text[textLen] = 0;
+
+        // realloc block sizes
         if (preedit->blockSizesBufferCount == 0)
         {
             preedit->blockSizes = _glfw_calloc(4, sizeof(int));
             preedit->blockSizesBufferCount = 4;
         }
+
+        // store preedit text
         src = text->string.multi_byte;
         rend = 0;
         rstart = textLen;
@@ -621,6 +626,9 @@ static void _ximPreeditDrawCallback(XIC xic, XPointer clientData, XIMPreeditDraw
                     rstart = i;
             }
         }
+
+        // store block sizes
+        // TODO: It doesn't care callData->chg_first != 0 case although it's quite rare.
         if (rstart == textLen)
         {
             preedit->blockSizesCount = 1;

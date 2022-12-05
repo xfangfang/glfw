@@ -587,16 +587,13 @@ static void _ximPreeditDrawCallback(XIC xic, XPointer clientData, XIMPreeditDraw
 
         textBufferCount = preedit->textBufferCount;
         while (textBufferCount < textLen + 1)
-        {
             textBufferCount = (textBufferCount == 0) ? 1 : textBufferCount * 2;
-        }
         if (textBufferCount != preedit->textBufferCount)
         {
             preeditText = _glfw_realloc(preedit->text, sizeof(unsigned int) * textBufferCount);
             if (preeditText == NULL)
-            {
                 return;
-            }
+
             preedit->text = preeditText;
             preedit->textBufferCount = textBufferCount;
         }
@@ -613,19 +610,17 @@ static void _ximPreeditDrawCallback(XIC xic, XPointer clientData, XIMPreeditDraw
         for (i = 0, j = 0; i < text->length; i++)
         {
             codePoint = _glfwDecodeUTF8(&src);
+
             if (i < callData->chg_first || callData->chg_first + textLen < i)
-            {
                 continue;
-            }
+
             preedit->text[j++] = codePoint;
             f = text->feedback[i];
             if ((f & XIMReverse) || (f & XIMHighlight))
             {
                 rend = i;
                 if (i < rstart)
-                {
                     rstart = i;
-                }
             }
         }
         if (rstart == textLen)

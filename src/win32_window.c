@@ -588,7 +588,7 @@ static GLFWbool getImmPreedit(_GLFWwindow* window)
         if (clauses)
             ImmGetCompositionStringW(hIMC, GCS_COMPCLAUSE, clauses, clauseBytes);
 
-        // store preedit text
+        // realloc preedit text
         while (textBufferCount < textLen + 1)
             textBufferCount = (textBufferCount == 0) ? 1 : textBufferCount * 2;
         if (textBufferCount != preedit->textBufferCount)
@@ -609,7 +609,7 @@ static GLFWbool getImmPreedit(_GLFWwindow* window)
             preedit->textBufferCount = textBufferCount;
         }
 
-        // store blocks
+        // realloc blocks
         preedit->blockSizesCount = clauses ? clauseBytes / sizeof(DWORD) - 1 : 1;
         while (blockBufferCount < preedit->blockSizesCount)
             blockBufferCount = (blockBufferCount == 0) ? 1 : blockBufferCount * 2;
@@ -631,6 +631,7 @@ static GLFWbool getImmPreedit(_GLFWwindow* window)
             preedit->blockSizesBufferCount = blockBufferCount;
         }
 
+        // store preedit text & block sizes
         {
             // Win32 API handles text data in UTF16, so we have to convert them
             // to UTF32. Not only the encoding, but also the number of characters,

@@ -578,7 +578,7 @@ static void _ximPreeditDrawCallback(XIC xic, XPointer clientData, XIMPreeditDraw
     else
     {
         XIMText* text = callData->text;
-        int textLen = callData->chg_length;
+        int textLen = preedit->textCount + text->length - callData->chg_length;
         int textBufferCount = preedit->textBufferCount;
         int i, j, rstart, rend;
         const char* src;
@@ -605,7 +605,7 @@ static void _ximPreeditDrawCallback(XIC xic, XPointer clientData, XIMPreeditDraw
         src = text->string.multi_byte;
         rend = 0;
         rstart = textLen;
-        for (i = 0, j = 0; i < text->length; i++)
+        for (i = 0, j = callData->chg_first; i < text->length; i++)
         {
             XIMFeedback f;
 

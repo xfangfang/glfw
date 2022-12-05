@@ -557,12 +557,6 @@ static void _ximPreeditDoneCallback(XIC xic, XPointer clientData, XPointer callD
 //
 static void _ximPreeditDrawCallback(XIC xic, XPointer clientData, XIMPreeditDrawCallbackStruct *callData)
 {
-    int i, j, textLen, textBufferCount, rstart, rend;
-    XIMText* text;
-    const char* src;
-    unsigned int codePoint;
-    unsigned int* preeditText;
-    XIMFeedback f;
     _GLFWwindow* window = (_GLFWwindow*) clientData;
     _GLFWpreedit* preedit = &window->preedit;
 
@@ -576,15 +570,21 @@ static void _ximPreeditDrawCallback(XIC xic, XPointer clientData, XIMPreeditDraw
         _glfwInputPreedit(window);
         return;
     }
+    else if (callData->text->encoding_is_wchar)
+    {
+        // wchar is not supported
+        return;
+    }
     else
     {
-        text = callData->text;
-        textLen = callData->chg_length;
-        if (text->encoding_is_wchar)
-        {
-            // wchar is not supported
-            return;
-        }
+        XIMText* text = callData->text;
+        int textLen = callData->chg_length;
+        int i, j, textBufferCount, rstart, rend;
+        const char* src;
+        unsigned int codePoint;
+        unsigned int* preeditText;
+        XIMFeedback f;
+
         textBufferCount = preedit->textBufferCount;
         while (textBufferCount < textLen + 1)
         {

@@ -555,7 +555,7 @@ static void _ximPreeditDoneCallback(XIC xic, XPointer clientData, XPointer callD
 // When using the dafault style: STYLE_OVERTHESPOT, this is not used since applications
 // don't need to display preedit texts.
 //
-static void _ximPreeditDrawCallback(XIC xic, XPointer clientData, XIMPreeditDrawCallbackStruct *callData)
+static void _ximPreeditDrawCallback(XIC xic, XPointer clientData, XIMPreeditDrawCallbackStruct* callData)
 {
     _GLFWwindow* window = (_GLFWwindow*) clientData;
     _GLFWpreedit* preedit = &window->preedit;

@@ -1353,13 +1353,13 @@ static void releaseMonitor(_GLFWwindow* window)
 static void processEvent(XEvent *event)
 {
     int keycode = 0;
-    Bool filtered = False;
 
     // HACK: Save scancode as some IMs clear the field in XFilterEvent
     if (event->type == KeyPress || event->type == KeyRelease)
         keycode = event->xkey.keycode;
 
-    filtered = XFilterEvent(event, None);
+    if (XFilterEvent(event, None))
+        return;
 
     if (_glfw.x11.randr.available)
     {
@@ -1471,7 +1471,6 @@ static void processEvent(XEvent *event)
                     window->x11.keyPressTimes[keycode] = event->xkey.time;
                 }
 
-                if (!filtered)
                 {
                     int count;
                     Status status;
@@ -1743,9 +1742,6 @@ static void processEvent(XEvent *event)
         case ClientMessage:
         {
             // Custom client message, probably from the window manager
-
-            if (filtered)
-                return;
 
             if (event->xclient.message_type == None)
                 return;

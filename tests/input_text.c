@@ -715,6 +715,7 @@ int main(int argc, char** argv)
 
     glfwWindowHint(GLFW_SCALE_TO_MONITOR, GLFW_TRUE);
     glfwWindowHint(GLFW_WIN32_KEYBOARD_MENU, GLFW_TRUE);
+    glfwWindowHint(GLFW_SOFT_FULLSCREEN, GLFW_TRUE);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
 

@@ -411,6 +411,18 @@ glfwResetPreeditText(window);
 @endcode
 
 
+@subsection ime_full_screen Full screen with IME
+
+To use IME in the full screen, you can use the
+[GLFW_SOFT_FULLSCREEN](@ref GLFW_SOFT_FULLSCREEN_hint) window hint.
+The default full screen of GLFW is exclusive and is not suitable for IME.
+Setting this window hint enables IME to display properly on the full screen.
+
+@code
+glfwWindowHint(GLFW_SOFT_FULLSCREEN, GLFW_TRUE);
+@endcode
+
+
 @subsection manage_preedit_candidate Manage preedit candidate
 
 By default, the IME manages the drawing of the preedit candidates, but

@@ -894,11 +894,11 @@ static LRESULT CALLBACK windowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
         case WM_IME_SETCONTEXT:
         {
             // To draw preedit text by an application side
-            if ((lParam & ISC_SHOWUICOMPOSITIONWINDOW) > 0)
+            if (lParam & ISC_SHOWUICOMPOSITIONWINDOW)
                 lParam &= ~ISC_SHOWUICOMPOSITIONWINDOW;
 
             if (_glfw.hints.init.managePreeditCandidate &&
-                (lParam & ISC_SHOWUICANDIDATEWINDOW) > 0)
+                (lParam & ISC_SHOWUICANDIDATEWINDOW))
             {
                 lParam &= ~ISC_SHOWUICANDIDATEWINDOW;
             }

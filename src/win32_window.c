@@ -650,7 +650,7 @@ static void getImmCandidates(_GLFWwindow* window)
 
         for (i = 0; i < candidateList->dwCount; ++i)
             setCandidate(&preedit->candidates[i],
-                         (void*) candidateList + candidateList->dwOffset[i]);
+                         (LPWSTR)((char*) candidateList + candidateList->dwOffset[i]));
 
         preedit->candidateCount = candidateList->dwCount;
         preedit->candidateSelection = candidateList->dwSelection;

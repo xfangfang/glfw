@@ -822,6 +822,17 @@ static GLFWbool getImmPreedit(_GLFWwindow* window)
     return GLFW_TRUE;
 }
 
+// Clear peedit data
+//
+static void clearImmPreedit(_GLFWwindow* window)
+{
+    window->preedit.blockSizesCount = 0;
+    window->preedit.textCount = 0;
+    window->preedit.focusedBlockIndex = 0;
+    window->preedit.caretIndex = 0;
+    _glfwInputPreedit(window);
+}
+
 // Commit the result texts of Imm32 to character-callback
 //
 static GLFWbool commitImmResultStr(_GLFWwindow* window)
@@ -867,7 +878,6 @@ static GLFWbool commitImmResultStr(_GLFWwindow* window)
 static LRESULT CALLBACK windowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
     _GLFWwindow* window = GetPropW(hWnd, L"GLFW");
-    _GLFWpreedit* preedit = &window->preedit;
     if (!window)
     {
         if (uMsg == WM_NCCREATE)
@@ -1145,11 +1155,10 @@ static LRESULT CALLBACK windowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
             break;
         }
         case WM_IME_ENDCOMPOSITION:
-            preedit->blockSizesCount = 0;
-            preedit->textCount = 0;
-            preedit->focusedBlockIndex = 0;
-            preedit->caretIndex = 0;
-            _glfwInputPreedit(window);
+            clearImmPreedit(window);
+            // Usually clearing candidates in IMN_CLOSECANDIDATE is sufficient.
+            // However, some IME need it here, e.g. Google Japanese Input.
+            clearImmCandidate(window);
             return TRUE;
         case WM_IME_NOTIFY:
             if (wParam == IMN_SETOPENSTATUS)

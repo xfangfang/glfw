@@ -1133,17 +1133,13 @@ static LRESULT CALLBACK windowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
 
         case WM_IME_COMPOSITION:
         {
-            if (lParam & GCS_RESULTSTR)
+            if (lParam & (GCS_RESULTSTR | GCS_COMPSTR))
             {
-                commitImmResultStr(window);
+                if (lParam & GCS_RESULTSTR)
+                    commitImmResultStr(window);
+                if (lParam & GCS_COMPSTR)
+                    getImmPreedit(window);
                 return TRUE;
-            }
-            if (lParam & GCS_COMPSTR)
-            {
-                if (getImmPreedit(window))
-                    return TRUE;
-                else
-                    return 0;
             }
             break;
         }

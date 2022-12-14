@@ -801,7 +801,8 @@ static GLFWbool getImmPreedit(_GLFWwindow* window)
             {
                 for (i = 0; i < preedit->blockSizesCount; i++)
                 {
-                    if (attributes[clauses[i]] != ATTR_CONVERTED)
+                    if (attributes[clauses[i]] == ATTR_TARGET_CONVERTED ||
+                        attributes[clauses[i]] == ATTR_TARGET_NOTCONVERTED)
                     {
                         preedit->focusedBlockIndex = i;
                         break;

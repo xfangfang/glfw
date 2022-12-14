@@ -672,7 +672,7 @@ static void clearImmCandidate(_GLFWwindow* window)
     _glfwInputPreeditCandidate(window);
 }
 
-// Get preedit texts of Imm32 and path them to preedit-callback
+// Get preedit texts of Imm32 and pass them to preedit-callback
 //
 static GLFWbool getImmPreedit(_GLFWwindow* window)
 {

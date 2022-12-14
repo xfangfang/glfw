@@ -567,6 +567,8 @@ static void maximizeWindowManually(_GLFWwindow* window)
                  SWP_NOACTIVATE | SWP_NOZORDER | SWP_FRAMECHANGED);
 }
 
+// Store candidate text from the buffer data
+//
 static void setCandidate(_GLFWpreeditcandidate* candidate, LPWSTR buffer)
 {
     size_t bufferCount = wcslen(buffer);
@@ -599,6 +601,8 @@ static void setCandidate(_GLFWpreeditcandidate* candidate, LPWSTR buffer)
     candidate->textCount = convertedLength;
 }
 
+// Get preedit candidates of Imm32 and pass them to candidate-callback
+//
 static void getImmCandidates(_GLFWwindow* window)
 {
     _GLFWpreedit* preedit = &window->preedit;
@@ -636,7 +640,7 @@ static void getImmCandidates(_GLFWwindow* window)
                 return;
             }
             // `realloc` does not initialize the increased area with 0.
-            // This logic should be moved to a more apporpriate place to share
+            // This logic should be moved to a more appropriate place to share
             // when other platforms support this feature.
             for (i = preedit->candidateBufferCount; i < bufferCount; ++i)
             {
@@ -663,6 +667,7 @@ static void getImmCandidates(_GLFWwindow* window)
     _glfwInputPreeditCandidate(window);
 }
 
+// Clear preedit candidates
 static void clearImmCandidate(_GLFWwindow* window)
 {
     window->preedit.candidateCount = 0;

@@ -595,7 +595,8 @@ static void set_candidate_labels(GLFWwindow* window, struct nk_context* nk)
 // we can set preedit-cursor position more easily.
 // However, there doesn't seem to be a way to do that, so this does a simplified calculation only for the end
 // of the text. (Can not trace the cursor movement)
-static void update_cursor_pos(GLFWwindow* window, struct nk_context* nk, struct nk_user_font* f, char* boxBuffer, int boxLen)
+static void update_cursor_pos(GLFWwindow* window, struct nk_context* nk, struct nk_user_font* f,
+                              char* boxBuffer, int boxLen, int boxX, int boxY)
 {
     float lineWidth = 0;
     int totalLines = 1;
@@ -631,14 +632,10 @@ static void update_cursor_pos(GLFWwindow* window, struct nk_context* nk, struct 
     }
 
     {
-        // I don't know how to get these info.
-        int widgetLayoutX = 10;
-        int widgetLayoutY = 220;
-
         int lineHeight = f->height + nk->style.edit.row_padding;
 
-        int cursorPosX = widgetLayoutX + lineWidth;
-        int cursorPosY = widgetLayoutY + lineHeight * (totalLines - 1);
+        int cursorPosX = boxX + lineWidth;
+        int cursorPosY = boxY + lineHeight * (totalLines - 1);
         int cursorHeight = lineHeight;
         int cursorWidth;
 
@@ -827,7 +824,9 @@ int main(int argc, char** argv)
         glfwSwapBuffers(window);
 
         if (isAutoUpdatingCursorPosEnabled)
-            update_cursor_pos(window, nk, &currentFont->handle, boxBuffer, boxLen);
+            // I don't know how to get the layout info of `nk_edit_string`.
+            update_cursor_pos(window, nk, &currentFont->handle, boxBuffer, boxLen, 10,
+                              managePreeditCandidate ? 385 : 220);
 
         glfwWaitEvents();
     }

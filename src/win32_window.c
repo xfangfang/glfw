@@ -36,6 +36,7 @@
 #include <string.h>
 #include <windowsx.h>
 #include <shellapi.h>
+#include <wchar.h>
 
 // Converts utf16 units to Unicode code points (UTF32).
 // Returns GLFW_TRUE when the converting completes and the result is assigned to

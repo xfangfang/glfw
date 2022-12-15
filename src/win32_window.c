@@ -627,7 +627,7 @@ static void getImmCandidates(_GLFWwindow* window)
         ImmGetCandidateListW(hIMC, 0, candidateList, candidateListBytes);
         ImmReleaseContext(window->win32.handle, hIMC);
 
-        while (bufferCount < candidateList->dwCount + 1)
+        while ((DWORD) bufferCount < candidateList->dwCount + 1)
             bufferCount = (bufferCount == 0) ? 1 : bufferCount * 2;
         if (bufferCount != preedit->candidateBufferCount)
         {
@@ -652,7 +652,7 @@ static void getImmCandidates(_GLFWwindow* window)
             preedit->candidateBufferCount = bufferCount;
         }
 
-        for (i = 0; i < candidateList->dwCount; ++i)
+        for (i = 0; (DWORD) i < candidateList->dwCount; ++i)
             setCandidate(&preedit->candidates[i],
                          (LPWSTR)((char*) candidateList + candidateList->dwOffset[i]));
 

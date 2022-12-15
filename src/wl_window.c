@@ -1827,12 +1827,26 @@ static void textInputV3Enter(void* data,
     zwp_text_input_v3_commit(textInputV3);
 }
 
+static void textInputV3Reset(_GLFWwindow* window)
+{
+    _GLFWpreedit* preedit = &window->preedit;
+
+    preedit->textCount = 0;
+    preedit->blockSizesCount = 0;
+    preedit->focusedBlockIndex = 0;
+    preedit->caretIndex = 0;
+
+    _glfwInputPreedit(window);
+}
+
 static void textInputV3Leave(void* data,
                              struct zwp_text_input_v3* textInputV3,
                              struct wl_surface* surface)
 {
+    _GLFWwindow* window = (_GLFWwindow*) data;
     zwp_text_input_v3_disable(textInputV3);
     zwp_text_input_v3_commit(textInputV3);
+    textInputV3Reset(window);
 }
 
 static void textInputV3PreeditString(void* data,

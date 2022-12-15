@@ -577,6 +577,7 @@ static void setCandidate(_GLFWpreeditcandidate* candidate, LPWSTR buffer)
     uint32_t codepoint;
     WCHAR highSurrogate = 0;
     int convertedLength = 0;
+    int i;
 
     while ((size_t) textBufferCount < bufferCount + 1)
         textBufferCount = (textBufferCount == 0) ? 1 : textBufferCount * 2;
@@ -591,7 +592,7 @@ static void setCandidate(_GLFWpreeditcandidate* candidate, LPWSTR buffer)
         candidate->textBufferCount = textBufferCount;
     }
 
-    for (int i = 0; i < bufferCount; ++i)
+    for (i = 0; (size_t) i < bufferCount; ++i)
     {
         if (convertToUTF32FromUTF16(buffer[i],
                                     &highSurrogate,

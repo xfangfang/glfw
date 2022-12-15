@@ -1178,12 +1178,14 @@ static LRESULT CALLBACK windowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
                     _glfwInputIMEStatus(window);
                     return TRUE;
                 }
+
                 case IMN_OPENCANDIDATE:
                 case IMN_CHANGECANDIDATE:
                 {
                     getImmCandidates(window);
                     return TRUE;
                 }
+
                 case IMN_CLOSECANDIDATE:
                 {
                     clearImmCandidate(window);

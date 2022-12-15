@@ -1159,13 +1159,18 @@ static LRESULT CALLBACK windowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
             }
             break;
         }
+
         case WM_IME_ENDCOMPOSITION:
+        {
             clearImmPreedit(window);
             // Usually clearing candidates in IMN_CLOSECANDIDATE is sufficient.
             // However, some IME need it here, e.g. Google Japanese Input.
             clearImmCandidate(window);
             return TRUE;
+        }
+
         case WM_IME_NOTIFY:
+        {
             switch (wParam)
             {
                 case IMN_SETOPENSTATUS:
@@ -1186,6 +1191,8 @@ static LRESULT CALLBACK windowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
                 }
             }
             break;
+        }
+
         case WM_LBUTTONDOWN:
         case WM_RBUTTONDOWN:
         case WM_MBUTTONDOWN:

@@ -111,6 +111,11 @@ typedef VkResult (APIENTRY *PFN_vkCreateMetalSurfaceEXT)(VkInstance,const VkMeta
 // HIToolbox.framework pointer typedefs
 #define kTISPropertyInputSourceID _glfw.ns.tis.kPropertyInputSourceID
 #define kTISPropertyUnicodeKeyLayoutData _glfw.ns.tis.kPropertyUnicodeKeyLayoutData
+#define kTISPropertyInputSourceCategory _glfw.ns.tis.kPropertyInputSourceCategory
+#define kTISCategoryKeyboardInputSource _glfw.ns.tis.kCategoryKeyboardInputSource
+#define kTISPropertyInputSourceIsSelectCapable _glfw.ns.tis.kPropertyInputSourceIsSelectCapable
+typedef CFArrayRef (*PEN_TISCreateInputSourceList)(CFDictionaryRef,Boolean);
+#define TISCreateInputSourceList _glfw.ns.tis.CreateInputSourceList
 typedef TISInputSourceRef (*PFN_TISCopyCurrentASCIICapableKeyboardInputSource)(void);
 #define TISCopyCurrentASCIICapableKeyboardInputSource _glfw.ns.tis.CopyCurrentASCIICapableKeyboardInputSource
 typedef TISInputSourceRef (*PFN_TISCopyCurrentKeyboardInputSource)(void);
@@ -203,6 +208,10 @@ typedef struct _GLFWlibraryNS
         PFN_TISGetInputSourceProperty GetInputSourceProperty;
         PFN_TISSelectInputSource SelectInputSource;
         PFN_LMGetKbdType GetKbdType;
+        PEN_TISCreateInputSourceList CreateInputSourceList;
+        CFStringRef     kPropertyInputSourceCategory;
+        CFStringRef     kCategoryKeyboardInputSource;
+        CFStringRef     kPropertyInputSourceIsSelectCapable;
         CFStringRef     kPropertyInputSourceID;
         CFStringRef     kPropertyUnicodeKeyLayoutData;
     } tis;

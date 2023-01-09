@@ -2031,8 +2031,32 @@ void _glfwSetIMEStatusCocoa(_GLFWwindow* window, int active)
         if (locale)
         {
             TISInputSourceRef source = TISCopyInputSourceForLanguage(locale);
-            TISSelectInputSource(source);
-            CFRelease(source);
+            if (source)
+            {
+                NSString* sourceID =
+                    (__bridge NSString *) TISGetInputSourceProperty(source, kTISPropertyInputSourceID);
+
+                NSDictionary* properties = @{
+                    (__bridge NSString*)kTISPropertyInputSourceCategory: (__bridge NSString*)kTISCategoryKeyboardInputSource,
+                    (__bridge NSString*)kTISPropertyInputSourceIsSelectCapable: @YES,
+                    };
+                NSArray* sources =
+                        CFBridgingRelease(TISCreateInputSourceList((__bridge CFDictionaryRef)properties, NO));
+
+                for (id sourceObj in sources)
+                {
+                    TISInputSourceRef ref = (__bridge TISInputSourceRef)sourceObj;
+                    NSString* refID =
+                        (__bridge NSString *) TISGetInputSourceProperty(ref, kTISPropertyInputSourceID);
+
+                    if ([refID containsString:sourceID]){
+                        TISSelectInputSource(ref);
+                        break;
+                    }
+                }
+
+                CFRelease(source);
+            }
         }
     }
     else

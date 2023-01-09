@@ -357,6 +357,15 @@ static GLFWbool initializeTIS(void)
     CFStringRef* kPropertyUnicodeKeyLayoutData =
         CFBundleGetDataPointerForName(_glfw.ns.tis.bundle,
                                       CFSTR("kTISPropertyUnicodeKeyLayoutData"));
+    CFStringRef* kPropertyInputSourceCategory =
+        CFBundleGetDataPointerForName(_glfw.ns.tis.bundle,
+                                      CFSTR("kTISPropertyInputSourceCategory"));
+    CFStringRef* kCategoryKeyboardInputSource =
+        CFBundleGetDataPointerForName(_glfw.ns.tis.bundle,
+                                      CFSTR("kTISCategoryKeyboardInputSource"));
+    CFStringRef* kPropertyInputSourceIsSelectCapable =
+        CFBundleGetDataPointerForName(_glfw.ns.tis.bundle,
+                                      CFSTR("kTISPropertyInputSourceIsSelectCapable"));
     _glfw.ns.tis.CopyCurrentASCIICapableKeyboardInputSource =
         CFBundleGetFunctionPointerForName(_glfw.ns.tis.bundle,
                                           CFSTR("TISCopyCurrentASCIICapableKeyboardInputSource"));
@@ -381,9 +390,16 @@ static GLFWbool initializeTIS(void)
     _glfw.ns.tis.GetKbdType =
         CFBundleGetFunctionPointerForName(_glfw.ns.tis.bundle,
                                           CFSTR("LMGetKbdType"));
+    _glfw.ns.tis.CreateInputSourceList =
+          CFBundleGetFunctionPointerForName(_glfw.ns.tis.bundle,
+                                          CFSTR("TISCreateInputSourceList"));
 
     if (!kPropertyInputSourceID ||
         !kPropertyUnicodeKeyLayoutData ||
+        !kPropertyInputSourceCategory ||
+        !kCategoryKeyboardInputSource||
+        !kPropertyInputSourceIsSelectCapable||
+        !TISCreateInputSourceList ||
         !TISCopyCurrentASCIICapableKeyboardInputSource ||
         !TISCopyCurrentKeyboardInputSource ||
         !TISCopyCurrentKeyboardLayoutInputSource ||
@@ -402,6 +418,12 @@ static GLFWbool initializeTIS(void)
         *kPropertyInputSourceID;
     _glfw.ns.tis.kPropertyUnicodeKeyLayoutData =
         *kPropertyUnicodeKeyLayoutData;
+    _glfw.ns.tis.kPropertyInputSourceCategory =
+            *kPropertyInputSourceCategory;
+    _glfw.ns.tis.kCategoryKeyboardInputSource =
+            *kCategoryKeyboardInputSource;
+    _glfw.ns.tis.kPropertyInputSourceIsSelectCapable =
+            *kPropertyInputSourceIsSelectCapable;
 
     return updateUnicodeData();
 }

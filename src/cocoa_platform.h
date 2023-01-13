@@ -109,13 +109,11 @@ typedef VkResult (APIENTRY *PFN_vkCreateMetalSurfaceEXT)(VkInstance,const VkMeta
 #define GLFW_NSGL_LIBRARY_CONTEXT_STATE _GLFWlibraryNSGL nsgl;
 
 // HIToolbox.framework pointer typedefs
-#define kTISPropertyInputSourceID _glfw.ns.tis.kPropertyInputSourceID
-#define kTISPropertyUnicodeKeyLayoutData _glfw.ns.tis.kPropertyUnicodeKeyLayoutData
-#define kTISPropertyInputSourceCategory _glfw.ns.tis.kPropertyInputSourceCategory
 #define kTISCategoryKeyboardInputSource _glfw.ns.tis.kCategoryKeyboardInputSource
+#define kTISPropertyInputSourceCategory _glfw.ns.tis.kPropertyInputSourceCategory
+#define kTISPropertyInputSourceID _glfw.ns.tis.kPropertyInputSourceID
 #define kTISPropertyInputSourceIsSelectCapable _glfw.ns.tis.kPropertyInputSourceIsSelectCapable
-typedef CFArrayRef (*PEN_TISCreateInputSourceList)(CFDictionaryRef,Boolean);
-#define TISCreateInputSourceList _glfw.ns.tis.CreateInputSourceList
+#define kTISPropertyUnicodeKeyLayoutData _glfw.ns.tis.kPropertyUnicodeKeyLayoutData
 typedef TISInputSourceRef (*PFN_TISCopyCurrentASCIICapableKeyboardInputSource)(void);
 #define TISCopyCurrentASCIICapableKeyboardInputSource _glfw.ns.tis.CopyCurrentASCIICapableKeyboardInputSource
 typedef TISInputSourceRef (*PFN_TISCopyCurrentKeyboardInputSource)(void);
@@ -126,6 +124,8 @@ typedef TISInputSourceRef (*PFN_TISCopyInputSourceForLanguage)(CFStringRef);
 #define TISCopyInputSourceForLanguage _glfw.ns.tis.CopyInputSourceForLanguage
 typedef CFArrayRef (*PFN_TISCreateASCIICapableInputSourceList)(void);
 #define TISCreateASCIICapableInputSourceList _glfw.ns.tis.CreateASCIICapableInputSourceList
+typedef CFArrayRef (*PEN_TISCreateInputSourceList)(CFDictionaryRef,Boolean);
+#define TISCreateInputSourceList _glfw.ns.tis.CreateInputSourceList
 typedef void* (*PFN_TISGetInputSourceProperty)(TISInputSourceRef,CFStringRef);
 #define TISGetInputSourceProperty _glfw.ns.tis.GetInputSourceProperty
 typedef OSStatus (*PFN_TISSelectInputSource)(TISInputSourceRef);
@@ -205,14 +205,14 @@ typedef struct _GLFWlibraryNS
         PFN_TISCopyCurrentKeyboardLayoutInputSource CopyCurrentKeyboardLayoutInputSource;
         PFN_TISCopyInputSourceForLanguage CopyInputSourceForLanguage;
         PFN_TISCreateASCIICapableInputSourceList CreateASCIICapableInputSourceList;
+        PEN_TISCreateInputSourceList CreateInputSourceList;
         PFN_TISGetInputSourceProperty GetInputSourceProperty;
         PFN_TISSelectInputSource SelectInputSource;
         PFN_LMGetKbdType GetKbdType;
-        PEN_TISCreateInputSourceList CreateInputSourceList;
-        CFStringRef     kPropertyInputSourceCategory;
         CFStringRef     kCategoryKeyboardInputSource;
-        CFStringRef     kPropertyInputSourceIsSelectCapable;
+        CFStringRef     kPropertyInputSourceCategory;
         CFStringRef     kPropertyInputSourceID;
+        CFStringRef     kPropertyInputSourceIsSelectCapable;
         CFStringRef     kPropertyUnicodeKeyLayoutData;
     } tis;
 } _GLFWlibraryNS;

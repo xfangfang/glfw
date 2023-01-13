@@ -2025,8 +2025,7 @@ void _glfwSetIMEStatusCocoa(_GLFWwindow* window, int active)
     if (active)
     {
         NSArray* locales = CFBridgingRelease(CFLocaleCopyPreferredLanguages());
-        // Not assuming an environment with multiple preferred locales, but if
-        // there are, select the first one anyway.
+        // Select the most preferred locale.
         CFStringRef locale = (__bridge CFStringRef) [locales firstObject];
         if (locale)
         {
@@ -2037,20 +2036,21 @@ void _glfwSetIMEStatusCocoa(_GLFWwindow* window, int active)
                     (__bridge NSString *) TISGetInputSourceProperty(source, kTISPropertyInputSourceID);
 
                 NSDictionary* properties = @{
-                    (__bridge NSString*)kTISPropertyInputSourceCategory: (__bridge NSString*)kTISCategoryKeyboardInputSource,
-                    (__bridge NSString*)kTISPropertyInputSourceIsSelectCapable: @YES,
+                    (__bridge NSString *) kTISPropertyInputSourceCategory: (__bridge NSString *) kTISCategoryKeyboardInputSource,
+                    (__bridge NSString *) kTISPropertyInputSourceIsSelectCapable: @YES,
                     };
-                NSArray* sources =
-                        CFBridgingRelease(TISCreateInputSourceList((__bridge CFDictionaryRef)properties, NO));
+                NSArray* selectableSources =
+                    CFBridgingRelease(TISCreateInputSourceList((__bridge CFDictionaryRef) properties, NO));
 
-                for (id sourceObj in sources)
+                for (id sourceCandidate in selectableSources)
                 {
-                    TISInputSourceRef ref = (__bridge TISInputSourceRef)sourceObj;
-                    NSString* refID =
-                        (__bridge NSString *) TISGetInputSourceProperty(ref, kTISPropertyInputSourceID);
+                    TISInputSourceRef sourceCandidateRef = (__bridge TISInputSourceRef) sourceCandidate;
+                    NSString* sourceCandidateID =
+                        (__bridge NSString *) TISGetInputSourceProperty(sourceCandidateRef, kTISPropertyInputSourceID);
 
-                    if ([refID containsString:sourceID]){
-                        TISSelectInputSource(ref);
+                    if ([sourceCandidateID hasPrefix:sourceID])
+                    {
+                        TISSelectInputSource(sourceCandidateRef);
                         break;
                     }
                 }

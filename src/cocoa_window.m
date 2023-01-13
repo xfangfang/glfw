@@ -2032,26 +2032,37 @@ void _glfwSetIMEStatusCocoa(_GLFWwindow* window, int active)
             TISInputSourceRef source = TISCopyInputSourceForLanguage(locale);
             if (source)
             {
-                NSString* sourceID =
-                    (__bridge NSString *) TISGetInputSourceProperty(source, kTISPropertyInputSourceID);
+                CFStringRef sourceType = TISGetInputSourceProperty(source,
+                                                                   kTISPropertyInputSourceType);
 
-                NSDictionary* properties = @{
-                    (__bridge NSString *) kTISPropertyInputSourceCategory: (__bridge NSString *) kTISCategoryKeyboardInputSource,
-                    (__bridge NSString *) kTISPropertyInputSourceIsSelectCapable: @YES,
-                    };
-                NSArray* selectableSources =
-                    CFBridgingRelease(TISCreateInputSourceList((__bridge CFDictionaryRef) properties, NO));
-
-                for (id sourceCandidate in selectableSources)
+                if (sourceType != kTISTypeKeyboardInputMethodModeEnabled)
+                    TISSelectInputSource(source);
+                else
                 {
-                    TISInputSourceRef sourceCandidateRef = (__bridge TISInputSourceRef) sourceCandidate;
-                    NSString* sourceCandidateID =
-                        (__bridge NSString *) TISGetInputSourceProperty(sourceCandidateRef, kTISPropertyInputSourceID);
-
-                    if ([sourceCandidateID hasPrefix:sourceID])
+                    // Some IMEs return a input-method that has input-method-modes for `TISCopyInputSourceForLanguage()`.
+                    // We can't select these input-methods directly, but need to find
+                    // a input-method-mode of the input-method.
+                    // Example:
+                    //  - Input Method: com.apple.inputmethod.SCIM
+                    //  - Input Mode: com.apple.inputmethod.SCIM.ITABC
+                    NSString* sourceID =
+                        (__bridge NSString *) TISGetInputSourceProperty(source, kTISPropertyInputSourceID);
+                    NSDictionary* properties = @{
+                        (__bridge NSString *) kTISPropertyInputSourceCategory: (__bridge NSString *) kTISCategoryKeyboardInputSource,
+                        (__bridge NSString *) kTISPropertyInputSourceIsSelectCapable: @YES,
+                        };
+                    NSArray* selectableSources =
+                        CFBridgingRelease(TISCreateInputSourceList((__bridge CFDictionaryRef) properties, NO));
+                    for (id sourceCandidate in selectableSources)
                     {
-                        TISSelectInputSource(sourceCandidateRef);
-                        break;
+                        TISInputSourceRef sourceCandidateRef = (__bridge TISInputSourceRef) sourceCandidate;
+                        NSString* sourceCandidateID =
+                            (__bridge NSString *) TISGetInputSourceProperty(sourceCandidateRef, kTISPropertyInputSourceID);
+                        if ([sourceCandidateID hasPrefix:sourceID])
+                        {
+                            TISSelectInputSource(sourceCandidateRef);
+                            break;
+                        }
                     }
                 }
 

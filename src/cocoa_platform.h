@@ -113,7 +113,9 @@ typedef VkResult (APIENTRY *PFN_vkCreateMetalSurfaceEXT)(VkInstance,const VkMeta
 #define kTISPropertyInputSourceCategory _glfw.ns.tis.kPropertyInputSourceCategory
 #define kTISPropertyInputSourceID _glfw.ns.tis.kPropertyInputSourceID
 #define kTISPropertyInputSourceIsSelectCapable _glfw.ns.tis.kPropertyInputSourceIsSelectCapable
+#define kTISPropertyInputSourceType _glfw.ns.tis.kPropertyInputSourceType
 #define kTISPropertyUnicodeKeyLayoutData _glfw.ns.tis.kPropertyUnicodeKeyLayoutData
+#define kTISTypeKeyboardInputMethodModeEnabled _glfw.ns.tis.kTypeKeyboardInputMethodModeEnabled
 typedef TISInputSourceRef (*PFN_TISCopyCurrentASCIICapableKeyboardInputSource)(void);
 #define TISCopyCurrentASCIICapableKeyboardInputSource _glfw.ns.tis.CopyCurrentASCIICapableKeyboardInputSource
 typedef TISInputSourceRef (*PFN_TISCopyCurrentKeyboardInputSource)(void);
@@ -213,7 +215,9 @@ typedef struct _GLFWlibraryNS
         CFStringRef     kPropertyInputSourceCategory;
         CFStringRef     kPropertyInputSourceID;
         CFStringRef     kPropertyInputSourceIsSelectCapable;
+        CFStringRef     kPropertyInputSourceType;
         CFStringRef     kPropertyUnicodeKeyLayoutData;
+        CFStringRef     kTypeKeyboardInputMethodModeEnabled;
     } tis;
 } _GLFWlibraryNS;
 

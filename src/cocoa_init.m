@@ -363,9 +363,15 @@ static GLFWbool initializeTIS(void)
     CFStringRef* kPropertyInputSourceIsSelectCapable =
         CFBundleGetDataPointerForName(_glfw.ns.tis.bundle,
                                       CFSTR("kTISPropertyInputSourceIsSelectCapable"));
+    CFStringRef* kPropertyInputSourceType =
+        CFBundleGetDataPointerForName(_glfw.ns.tis.bundle,
+                                      CFSTR("kTISPropertyInputSourceType"));
     CFStringRef* kPropertyUnicodeKeyLayoutData =
         CFBundleGetDataPointerForName(_glfw.ns.tis.bundle,
                                       CFSTR("kTISPropertyUnicodeKeyLayoutData"));
+    CFStringRef* kTypeKeyboardInputMethodModeEnabled =
+        CFBundleGetDataPointerForName(_glfw.ns.tis.bundle,
+                                      CFSTR("kTISTypeKeyboardInputMethodModeEnabled"));
     _glfw.ns.tis.CopyCurrentASCIICapableKeyboardInputSource =
         CFBundleGetFunctionPointerForName(_glfw.ns.tis.bundle,
                                           CFSTR("TISCopyCurrentASCIICapableKeyboardInputSource"));
@@ -398,7 +404,9 @@ static GLFWbool initializeTIS(void)
         !kPropertyInputSourceCategory ||
         !kPropertyInputSourceID ||
         !kPropertyInputSourceIsSelectCapable||
+        !kPropertyInputSourceType||
         !kPropertyUnicodeKeyLayoutData ||
+        !kTypeKeyboardInputMethodModeEnabled ||
         !TISCopyCurrentASCIICapableKeyboardInputSource ||
         !TISCopyCurrentKeyboardInputSource ||
         !TISCopyCurrentKeyboardLayoutInputSource ||
@@ -422,8 +430,12 @@ static GLFWbool initializeTIS(void)
         *kPropertyInputSourceID;
     _glfw.ns.tis.kPropertyInputSourceIsSelectCapable =
         *kPropertyInputSourceIsSelectCapable;
+    _glfw.ns.tis.kPropertyInputSourceType =
+        *kPropertyInputSourceType;
     _glfw.ns.tis.kPropertyUnicodeKeyLayoutData =
         *kPropertyUnicodeKeyLayoutData;
+    _glfw.ns.tis.kTypeKeyboardInputMethodModeEnabled =
+        *kTypeKeyboardInputMethodModeEnabled;
 
     return updateUnicodeData();
 }

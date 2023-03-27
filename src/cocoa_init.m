@@ -575,6 +575,8 @@ GLFWbool _glfwConnectCocoa(int platformID, _GLFWplatform* platform)
         _glfwResetPreeditTextCocoa,
         _glfwSetIMEStatusCocoa,
         _glfwGetIMEStatusCocoa,
+        _glfwSetTouchInputCocoa,
+        _glfwTouchInputSupportedCocoa,
         _glfwInitJoysticksCocoa,
         _glfwTerminateJoysticksCocoa,
         _glfwPollJoystickCocoa,

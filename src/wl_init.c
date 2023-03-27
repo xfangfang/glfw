@@ -434,6 +434,8 @@ GLFWbool _glfwConnectWayland(int platformID, _GLFWplatform* platform)
         _glfwResetPreeditTextWayland,
         _glfwSetIMEStatusWayland,
         _glfwGetIMEStatusWayland,
+         _glfwSetTouchInputWayland,
+        _glfwTouchInputSupportedWayland,
 #if defined(GLFW_BUILD_LINUX_JOYSTICK)
         _glfwInitJoysticksLinux,
         _glfwTerminateJoysticksLinux,

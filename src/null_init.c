@@ -61,6 +61,8 @@ GLFWbool _glfwConnectNull(int platformID, _GLFWplatform* platform)
         _glfwResetPreeditTextNull,
         _glfwSetIMEStatusNull,
         _glfwGetIMEStatusNull,
+        _glfwSetTouchInputNull,
+        _glfwTouchInputSupportedNull,
         _glfwInitJoysticksNull,
         _glfwTerminateJoysticksNull,
         _glfwPollJoystickNull,

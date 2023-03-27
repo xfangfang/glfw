@@ -1193,6 +1193,8 @@ GLFWbool _glfwConnectX11(int platformID, _GLFWplatform* platform)
         _glfwResetPreeditTextX11,
         _glfwSetIMEStatusX11,
         _glfwGetIMEStatusX11,
+        _glfwSetTouchInputX11,
+        _glfwTouchInputSupportedX11,
 #if defined(GLFW_BUILD_LINUX_JOYSTICK)
         _glfwInitJoysticksLinux,
         _glfwTerminateJoysticksLinux,

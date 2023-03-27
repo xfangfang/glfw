@@ -658,6 +658,9 @@ void _glfwWaitEventsWayland(void);
 void _glfwWaitEventsTimeoutWayland(double timeout);
 void _glfwPostEmptyEventWayland(void);
 
+void _glfwSetTouchInputWayland(_GLFWwindow *window, GLFWbool enabled);
+GLFWbool _glfwTouchInputSupportedWayland(void);
+
 void _glfwGetCursorPosWayland(_GLFWwindow* window, double* xpos, double* ypos);
 void _glfwSetCursorPosWayland(_GLFWwindow* window, double xpos, double ypos);
 void _glfwSetCursorModeWayland(_GLFWwindow* window, int mode);

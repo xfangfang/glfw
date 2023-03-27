@@ -266,6 +266,9 @@ void _glfwResetPreeditTextNull(_GLFWwindow* window);
 void _glfwSetIMEStatusNull(_GLFWwindow* window, int active);
 int _glfwGetIMEStatusNull(_GLFWwindow* window);
 
+void _glfwSetTouchInputNull(_GLFWwindow *window, GLFWbool enabled);
+GLFWbool _glfwTouchInputSupportedNull(void);
+
 EGLenum _glfwGetEGLPlatformNull(EGLint** attribs);
 EGLNativeDisplayType _glfwGetEGLNativeDisplayNull(void);
 EGLNativeWindowType _glfwGetEGLNativeWindowNull(_GLFWwindow* window);

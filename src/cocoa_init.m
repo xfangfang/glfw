@@ -509,6 +509,8 @@ GLFWbool _glfwConnectCocoa(int platformID, _GLFWplatform* platform)
         .getKeyScancode = _glfwGetKeyScancodeCocoa,
         .setClipboardString = _glfwSetClipboardStringCocoa,
         .getClipboardString = _glfwGetClipboardStringCocoa,
+        .setTouchInput = _glfwSetTouchInputCocoa,
+        .touchInputSupported = _glfwTouchInputSupportedCocoa,
         .initJoysticks = _glfwInitJoysticksCocoa,
         .terminateJoysticks = _glfwTerminateJoysticksCocoa,
         .pollJoystick = _glfwPollJoystickCocoa,

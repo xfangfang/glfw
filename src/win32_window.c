@@ -893,7 +893,9 @@ static LRESULT CALLBACK windowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
             window->win32.lastCursorPosX = x;
             window->win32.lastCursorPosY = y;
 
-            return 0;
+            // NOTE: WM_MOUSEMOVE messages must be passed on to DefWindowProc
+            //       for WM_TOUCH messages to be emitted
+            break;
         }
 
         case WM_INPUT:
@@ -1137,6 +1139,60 @@ static LRESULT CALLBACK windowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
             }
 
             return 0;
+        }
+
+        case WM_TOUCH:
+        {
+            TOUCHINPUT* inputs;
+            UINT count = LOWORD(wParam);
+
+            if (!_glfw.win32.touch.available)
+                return 0;
+
+            inputs = (TOUCHINPUT*) malloc(sizeof(TOUCHINPUT) * count);
+
+            if (GetTouchInputInfo((HTOUCHINPUT) lParam,
+                    count, inputs, sizeof(TOUCHINPUT)))
+            {
+                UINT i;
+                int width, height, xpos, ypos;
+
+                _glfwGetWindowSizeWin32(window, &width, &height);
+                _glfwGetWindowPosWin32(window, &xpos, &ypos);
+
+                for (i = 0;  i < count;  i++)
+                {
+                    int action;
+                    POINT pos;
+
+                    pos.x = TOUCH_COORD_TO_PIXEL(inputs[i].x) - xpos;
+                    pos.y = TOUCH_COORD_TO_PIXEL(inputs[i].y) - ypos;
+
+                    // Discard any points that lie outside of the client area
+                    if (pos.x < 0 || pos.x >= width ||
+                        pos.y < 0 || pos.y >= height)
+                    {
+                        continue;
+                    }
+
+                    if (inputs[i].dwFlags & TOUCHEVENTF_DOWN)
+                        action = GLFW_PRESS;
+                    else if (inputs[i].dwFlags & TOUCHEVENTF_UP)
+                        action = GLFW_RELEASE;
+                    else
+                        action = GLFW_MOVE;
+
+                    _glfwInputTouch(window,
+                        (int) inputs[i].dwID, action,
+                        inputs[i].x / 100.0 - xpos,
+                        inputs[i].y / 100.0 - ypos);
+                }
+
+                CloseTouchInputHandle((HTOUCHINPUT) lParam);
+            }
+
+            free(inputs);
+            break;
         }
 
         case WM_PAINT:
@@ -2096,6 +2152,22 @@ void _glfwSetRawMouseMotionWin32(_GLFWwindow *window, GLFWbool enabled)
 GLFWbool _glfwRawMouseMotionSupportedWin32(void)
 {
     return GLFW_TRUE;
+}
+
+void _glfwSetTouchInputWin32(_GLFWwindow* window, int enabled)
+{
+    if (!_glfw.win32.touch.available)
+        return;
+
+    if (enabled)
+        RegisterTouchWindow(window->win32.handle, 0);
+    else
+        UnregisterTouchWindow(window->win32.handle);
+}
+
+GLFWbool _glfwTouchInputSupportedWin32(void)
+{
+    return _glfw.win32.touch.available;
 }
 
 void _glfwPollEventsWin32(void)

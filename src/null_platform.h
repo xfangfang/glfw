@@ -267,5 +267,9 @@ void _glfwGetRequiredInstanceExtensionsNull(char** extensions);
 GLFWbool _glfwGetPhysicalDevicePresentationSupportNull(VkInstance instance, VkPhysicalDevice device, uint32_t queuefamily);
 VkResult _glfwCreateWindowSurfaceNull(VkInstance instance, _GLFWwindow* window, const VkAllocationCallbacks* allocator, VkSurfaceKHR* surface);
 
+
+void _glfwSetTouchInputNull(_GLFWwindow *window, GLFWbool enabled);
+GLFWbool _glfwTouchInputSupportedNull(void);
+
 void _glfwPollMonitorsNull(void);
 

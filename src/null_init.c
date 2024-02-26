@@ -55,6 +55,8 @@ GLFWbool _glfwConnectNull(int platformID, _GLFWplatform* platform)
         .getKeyScancode = _glfwGetKeyScancodeNull,
         .setClipboardString = _glfwSetClipboardStringNull,
         .getClipboardString = _glfwGetClipboardStringNull,
+        .setTouchInput = _glfwSetTouchInputNull,
+        .touchInputSupported = _glfwTouchInputSupportedNull,
         .initJoysticks = _glfwInitJoysticksNull,
         .terminateJoysticks = _glfwTerminateJoysticksNull,
         .pollJoystick = _glfwPollJoystickNull,

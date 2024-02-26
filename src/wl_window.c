@@ -2657,6 +2657,17 @@ void _glfwPostEmptyEventWayland(void)
     flushDisplay();
 }
 
+void _glfwSetTouchInputWayland(_GLFWwindow *window, GLFWbool enabled)
+{
+    _glfwInputError(GLFW_FEATURE_UNIMPLEMENTED,
+        "Wayland: Touch input not yet implemented");
+}
+
+GLFWbool _glfwTouchInputSupportedWayland(void)
+{
+    return GLFW_FALSE;
+}
+
 void _glfwGetCursorPosWayland(_GLFWwindow* window, double* xpos, double* ypos)
 {
     if (xpos)

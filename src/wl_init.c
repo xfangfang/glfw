@@ -445,6 +445,8 @@ GLFWbool _glfwConnectWayland(int platformID, _GLFWplatform* platform)
         .getKeyScancode = _glfwGetKeyScancodeWayland,
         .setClipboardString = _glfwSetClipboardStringWayland,
         .getClipboardString = _glfwGetClipboardStringWayland,
+        .setTouchInput = _glfwSetTouchInputWayland,
+        .touchInputSupported = _glfwTouchInputSupportedWayland,
 #if defined(GLFW_BUILD_LINUX_JOYSTICK)
         .initJoysticks = _glfwInitJoysticksLinux,
         .terminateJoysticks = _glfwTerminateJoysticksLinux,

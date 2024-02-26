@@ -1182,6 +1182,8 @@ GLFWbool _glfwConnectX11(int platformID, _GLFWplatform* platform)
         .getKeyScancode = _glfwGetKeyScancodeX11,
         .setClipboardString = _glfwSetClipboardStringX11,
         .getClipboardString = _glfwGetClipboardStringX11,
+        .setTouchInput = _glfwSetTouchInputX11,
+        .touchInputSupported = _glfwTouchInputSupportedX11,
 #if defined(GLFW_BUILD_LINUX_JOYSTICK)
         .initJoysticks = _glfwInitJoysticksLinux,
         .terminateJoysticks = _glfwTerminateJoysticksLinux,

@@ -52,6 +52,7 @@ typedef struct
     GLFWwindow* window;
     int number;
     int closeable;
+    int touch;
 } Slot;
 
 static void usage(void)
@@ -205,6 +206,8 @@ static const char* get_action_name(int action)
             return "released";
         case GLFW_REPEAT:
             return "repeated";
+        case GLFW_MOVE:
+            return "moved";
     }
 
     return "caused unknown action";
@@ -435,6 +438,15 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 
     switch (key)
     {
+        case GLFW_KEY_T:
+        {
+            slot->touch = !slot->touch;
+            glfwSetInputMode(window, GLFW_TOUCH, slot->touch);
+
+            printf("(( touch %s ))\n", slot->touch ? "enabled" : "disabled");
+            break;
+        }
+
         case GLFW_KEY_C:
         {
             slot->closeable = !slot->closeable;
@@ -556,6 +568,16 @@ static void monitor_callback(GLFWmonitor* monitor, int event)
     }
 }
 
+static void touch_callback(GLFWwindow* window, int touch, int action, double x, double y)
+{
+    printf("%08x at %0.3f: Touch %i %s at position %0.3f %0.3f\n",
+        counter++,
+        glfwGetTime(),
+        touch,
+        get_action_name(action),
+        x, y);
+}
+
 static void joystick_callback(int jid, int event)
 {
     if (event == GLFW_CONNECTED)
@@ -658,6 +680,7 @@ int main(int argc, char** argv)
         char title[128];
 
         slots[i].closeable = GLFW_TRUE;
+        slots[i].touch = GLFW_FALSE;
         slots[i].number = i + 1;
 
         snprintf(title, sizeof(title), "Event Linter (Window %i)", slots[i].number);
@@ -704,6 +727,7 @@ int main(int argc, char** argv)
         glfwSetPreeditCallback(slots[i].window, preedit_callback);
         glfwSetIMEStatusCallback(slots[i].window, ime_callback);
         glfwSetDropCallback(slots[i].window, drop_callback);
+        glfwSetTouchCallback(slots[i].window, touch_callback);
 
         glfwMakeContextCurrent(slots[i].window);
         gladLoadGL(glfwGetProcAddress);

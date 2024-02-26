@@ -111,6 +111,23 @@ static GLFWbool loadLibraries(void)
             _glfwPlatformGetModuleSymbol(_glfw.win32.dinput8.instance, "DirectInput8Create");
     }
 
+    _glfw.win32.user32.GetTouchInputInfo_ = (PFN_GetTouchInputInfo)
+        GetProcAddress(_glfw.win32.user32.instance, "GetTouchInputInfo");
+    _glfw.win32.user32.CloseTouchInputHandle_ = (PFN_CloseTouchInputHandle)
+        GetProcAddress(_glfw.win32.user32.instance, "CloseTouchInputHandle");
+    _glfw.win32.user32.RegisterTouchWindow_ = (PFN_RegisterTouchWindow)
+        GetProcAddress(_glfw.win32.user32.instance, "RegisterTouchWindow");
+    _glfw.win32.user32.UnregisterTouchWindow_ = (PFN_UnregisterTouchWindow)
+        GetProcAddress(_glfw.win32.user32.instance, "UnregisterTouchWindow");
+
+    if (_glfw.win32.user32.GetTouchInputInfo_ &&
+        _glfw.win32.user32.CloseTouchInputHandle_ &&
+        _glfw.win32.user32.RegisterTouchWindow_ &&
+        _glfw.win32.user32.UnregisterTouchWindow_)
+    {
+        _glfw.win32.touch.available = GLFW_TRUE;
+    }
+
     {
         int i;
         const char* names[] =
@@ -650,6 +667,8 @@ GLFWbool _glfwConnectWin32(int platformID, _GLFWplatform* platform)
         .resetPreeditText = _glfwResetPreeditTextWin32,
         .setIMEStatus = _glfwSetIMEStatusWin32,
         .getIMEStatus = _glfwGetIMEStatusWin32,
+        .setTouchInput = _glfwSetTouchInputWin32,
+        .touchInputSupported = _glfwTouchInputSupportedWin32,
         .initJoysticks = _glfwInitJoysticksWin32,
         .terminateJoysticks = _glfwTerminateJoysticksWin32,
         .pollJoystick = _glfwPollJoystickWin32,

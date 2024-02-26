@@ -963,6 +963,9 @@ void _glfwSetWindowMousePassthroughX11(_GLFWwindow* window, GLFWbool enabled);
 void _glfwSetRawMouseMotionX11(_GLFWwindow *window, GLFWbool enabled);
 GLFWbool _glfwRawMouseMotionSupportedX11(void);
 
+void _glfwSetTouchInputX11(_GLFWwindow *window, GLFWbool enabled);
+GLFWbool _glfwTouchInputSupportedX11(void);
+
 void _glfwPollEventsX11(void);
 void _glfwWaitEventsX11(void);
 void _glfwWaitEventsTimeoutX11(double timeout);

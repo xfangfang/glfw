@@ -1224,6 +1224,13 @@ static LRESULT CALLBACK windowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
         {
             int i, button, action;
 
+            if (window->touchInput)
+            {
+                // Skip emulated button events when touch input is enabled
+                if ((GetMessageExtraInfo() & 0xffffff00) == 0xff515700)
+                    break;
+            }
+
             if (uMsg == WM_LBUTTONDOWN || uMsg == WM_LBUTTONUP)
                 button = GLFW_MOUSE_BUTTON_LEFT;
             else if (uMsg == WM_RBUTTONDOWN || uMsg == WM_RBUTTONUP)

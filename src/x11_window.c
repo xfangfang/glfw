@@ -1141,6 +1141,64 @@ static void releaseMonitor(_GLFWwindow* window)
     }
 }
 
+// Process the XInput2 event
+//
+static void processXInput2Event(XGenericEventCookie *xcookie)
+{
+    switch(xcookie->evtype)
+    {
+        case XI_RawMotion:
+        {
+            _GLFWwindow* window = _glfw.x11.disabledCursorWindow;
+            if (!window || !window->rawMouseMotion)
+                break;
+            XIRawEvent* re = xcookie->data;
+            if (!re->valuators.mask_len)
+                break;
+            const double* values = re->raw_values;
+            double xpos          = window->virtualCursorPosX;
+            double ypos          = window->virtualCursorPosY;
+
+            if (XIMaskIsSet(re->valuators.mask, 0))
+            {
+                xpos += *values;
+                values++;
+            }
+
+            if (XIMaskIsSet(re->valuators.mask, 1))
+                ypos += *values;
+
+            _glfwInputCursorPos(window, xpos, ypos);
+            break;
+        }
+
+        case XI_TouchBegin:
+        case XI_TouchUpdate:
+        case XI_TouchEnd:
+        {
+            int action = GLFW_PRESS;
+            if (xcookie->evtype == XI_TouchUpdate)
+                action = GLFW_MOVE;
+            else if (xcookie->evtype == XI_TouchEnd)
+                action = GLFW_RELEASE;
+
+            XIDeviceEvent * de   = xcookie->data;
+            _GLFWwindow* window = NULL;
+
+            if (XFindContext(_glfw.x11.display,
+                    de->event,
+                    _glfw.x11.context,
+                    (XPointer*) &window) != 0)
+                break;
+
+            _glfwInputTouch(window,
+                de->detail, action,
+                de->event_x, de->event_y);
+            break;
+        }
+    }
+}
+
 // Process the specified X event
 //
 static void processEvent(XEvent *event)
@@ -1180,38 +1238,14 @@ static void processEvent(XEvent *event)
 
     if (event->type == GenericEvent)
     {
-        if (_glfw.x11.xi.available)
-        {
-            _GLFWwindow* window = _glfw.x11.disabledCursorWindow;
+        if (!_glfw.x11.xi.available ||
+            event->xcookie.extension != _glfw.x11.xi.majorOpcode)
+            return;
 
-            if (window &&
-                window->rawMouseMotion &&
-                event->xcookie.extension == _glfw.x11.xi.majorOpcode &&
-                XGetEventData(_glfw.x11.display, &event->xcookie) &&
-                event->xcookie.evtype == XI_RawMotion)
-            {
-                XIRawEvent* re = event->xcookie.data;
-                if (re->valuators.mask_len)
-                {
-                    const double* values = re->raw_values;
-                    double xpos = window->virtualCursorPosX;
-                    double ypos = window->virtualCursorPosY;
+        if (XGetEventData(_glfw.x11.display, &event->xcookie))
+            processXInput2Event(&event->xcookie);
 
-                    if (XIMaskIsSet(re->valuators.mask, 0))
-                    {
-                        xpos += *values;
-                        values++;
-                    }
-
-                    if (XIMaskIsSet(re->valuators.mask, 1))
-                        ypos += *values;
-
-                    _glfwInputCursorPos(window, xpos, ypos);
-                }
-            }
-
-            XFreeEventData(_glfw.x11.display, &event->xcookie);
-        }
+        XFreeEventData(_glfw.x11.display, &event->xcookie);
 
         return;
     }
@@ -2781,13 +2815,40 @@ GLFWbool _glfwRawMouseMotionSupportedX11(void)
 
 void _glfwSetTouchInputX11(_GLFWwindow *window, GLFWbool enabled)
 {
-    _glfwInputError(GLFW_FEATURE_UNIMPLEMENTED,
-        "Cocoa: Touch input not yet implemented");
+    if (!_glfw.x11.xi.touch_available)
+        return;
+
+    if (enabled)
+    {
+        XIEventMask em;
+        unsigned char mask[XIMaskLen(XI_TouchEnd)] = { 0 };
+
+        em.deviceid = XIAllMasterDevices;
+        em.mask_len = sizeof(mask);
+        em.mask = mask;
+        XISetMask(mask, XI_TouchBegin);
+        XISetMask(mask, XI_TouchUpdate);
+        XISetMask(mask, XI_TouchEnd);
+        XISetMask(mask, XI_Motion);
+
+        XISelectEvents(_glfw.x11.display, window->x11.handle, &em, 1);
+    }
+    else
+    {
+        XIEventMask em;
+        unsigned char mask[] = { 0 };
+
+        em.deviceid = XIAllMasterDevices;
+        em.mask_len = sizeof(mask);
+        em.mask = mask;
+
+        XISelectEvents(_glfw.x11.display, window->x11.handle, &em, 1);
+    }
 }
 
 GLFWbool _glfwTouchInputSupportedX11(void)
 {
-    return GLFW_FALSE;
+    return _glfw.x11.xi.touch_available;
 }
 
 void _glfwPollEventsX11(void)

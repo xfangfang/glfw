@@ -3619,18 +3619,42 @@ const char* _glfwGetClipboardStringWayland(void)
 void _glfwUpdatePreeditCursorRectangleWayland(_GLFWwindow* window)
 {
     _GLFWpreedit* preedit = &window->preedit;
-    int x = preedit->cursorPosX;
-    int y = preedit->cursorPosY;
-    int w = preedit->cursorWidth;
-    int h = preedit->cursorHeight;
+    GLFWbool change = GLFW_FALSE;
+    if (_glfw.wl.ime.cursor_x != preedit->cursorPosX)
+    {
+        _glfw.wl.ime.cursor_x = preedit->cursorPosX;
+        change = GLFW_TRUE;
+    }
+    if (_glfw.wl.ime.cursor_y != preedit->cursorPosY)
+    {
+        _glfw.wl.ime.cursor_y = preedit->cursorPosY;
+        change = GLFW_TRUE;
+    }
+    if (_glfw.wl.ime.cursor_w != preedit->cursorWidth)
+    {
+        _glfw.wl.ime.cursor_w = preedit->cursorWidth;
+        change = GLFW_TRUE;
+    }
+    if (_glfw.wl.ime.cursor_h != preedit->cursorHeight)
+    {
+        _glfw.wl.ime.cursor_h = preedit->cursorHeight;
+        change = GLFW_TRUE;
+    }
+
+    if (!change)
+        return;
 
     if (window->wl.textInputV3)
     {
-        zwp_text_input_v3_set_cursor_rectangle(window->wl.textInputV3, x, y, w, h);
+        zwp_text_input_v3_set_cursor_rectangle(window->wl.textInputV3,
+            preedit->cursorPosX, preedit->cursorPosY,
+            preedit->cursorWidth, preedit->cursorHeight);
         zwp_text_input_v3_commit(window->wl.textInputV3);
     }
     else if (window->wl.textInputV1)
-        zwp_text_input_v1_set_cursor_rectangle(window->wl.textInputV1, x, y, w, h);
+        zwp_text_input_v1_set_cursor_rectangle(window->wl.textInputV1,
+            preedit->cursorPosX, preedit->cursorPosY,
+            preedit->cursorWidth, preedit->cursorHeight);
 }
 
 void _glfwResetPreeditTextWayland(_GLFWwindow* window)

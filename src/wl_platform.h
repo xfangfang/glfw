@@ -550,6 +550,13 @@ typedef struct _GLFWlibraryWayland
     } cursor;
 
     struct {
+        int                     cursor_x;
+        int                     cursor_y;
+        int                     cursor_w;
+        int                     cursor_h;
+    } ime;
+
+    struct {
         void*                   handle;
 
         PFN_wl_egl_window_create window_create;

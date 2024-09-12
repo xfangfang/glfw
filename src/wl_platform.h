@@ -550,6 +550,7 @@ typedef struct _GLFWlibraryWayland
     } cursor;
 
     struct {
+        GLFWbool                active;
         int                     cursor_x;
         int                     cursor_y;
         int                     cursor_w;

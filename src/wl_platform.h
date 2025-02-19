@@ -345,6 +345,14 @@ typedef struct _GLFWscaleWayland
     int32_t                     factor;
 } _GLFWscaleWayland;
 
+typedef struct _GLFWtouchIdWayland
+{
+    int                         id;
+    _GLFWwindow*                focus;
+    double                      last_xpos;
+    double                      last_ypos;
+} _GLFWtouchIdWayland;
+
 // Wayland-specific per-window data
 //
 typedef struct _GLFWwindowWayland
@@ -520,8 +528,7 @@ typedef struct _GLFWlibraryWayland
     _GLFWwindow*                pointerFocus;
     _GLFWwindow*                keyboardFocus;
 
-    int*                        touchIDs;
-    _GLFWwindow**               touchFocuses;
+    _GLFWtouchIdWayland*        touchIDs;
     int                         touchSize;
     int                         touchEnabled;
 

@@ -1900,7 +1900,7 @@ static void touchHandleDown(void* data,
     // Searching for an empty slot for our new contact point
     for (i = 0; i < _glfw.wl.touchSize; ++i)
     {
-        if (_glfw.wl.touchIDs[i] < 0)
+        if (_glfw.wl.touchIDs[i].id < 0)
         {
             found = i;
             break;
@@ -1910,35 +1910,29 @@ static void touchHandleDown(void* data,
     // None found, so let’s increase the size of both buffers
     if (found < 0)
     {
-        int* ids = _glfw.wl.touchIDs;
-        _GLFWwindow** focuses = _glfw.wl.touchFocuses;
         int size = _glfw.wl.touchSize * 2;
 
-        ids = _glfw_realloc(ids, size * sizeof(int));
-        if (!ids)
-        {
-            _glfwInputError(GLFW_OUT_OF_MEMORY, NULL);
-            return;
-        }
-        focuses = _glfw_realloc(focuses, size * sizeof(_GLFWwindow*));
-        if (!focuses)
-        {
+        _GLFWtouchIdWayland* touchIDs = 
+            _glfw_realloc(_glfw.wl.touchIDs,
+                          sizeof(_GLFWtouchIdWayland) * size);
+        if (!touchIDs) {
             _glfwInputError(GLFW_OUT_OF_MEMORY, NULL);
             return;
         }
 
         for (i = _glfw.wl.touchSize; i < size; ++i)
-            ids[i] = -1;
+            touchIDs[i].id = -1;
 
         found = _glfw.wl.touchSize;
-        _glfw.wl.touchIDs = ids;
-        _glfw.wl.touchFocuses = focuses;
+        _glfw.wl.touchIDs = touchIDs;
         _glfw.wl.touchSize = size;
     }
 
     // Add our new contact point to the buffers and notify the common code
-    _glfw.wl.touchIDs[found] = id;
-    _glfw.wl.touchFocuses[found] = window;
+    _glfw.wl.touchIDs[found].id = id;
+    _glfw.wl.touchIDs[found].focus = window;
+    _glfw.wl.touchIDs[found].last_xpos = xpos;
+    _glfw.wl.touchIDs[found].last_ypos = ypos;
     _glfwInputTouch(window, id, GLFW_PRESS, xpos, ypos);
 }
 
@@ -1948,6 +1942,7 @@ static void touchHandleUp(void* data,
     uint32_t time,
     int32_t id)
 {
+    double xpos, ypos;
     int i;
 
     if (!_glfw.wl.touchEnabled)
@@ -1955,16 +1950,18 @@ static void touchHandleUp(void* data,
 
     for (i = 0; i < _glfw.wl.touchSize; ++i)
     {
-        if (_glfw.wl.touchIDs[i] == id)
+        if (_glfw.wl.touchIDs[i].id == id)
         {
-            _GLFWwindow* window = _glfw.wl.touchFocuses[i];
+            _GLFWwindow* window = _glfw.wl.touchIDs[i].focus;
 
             if (!window)
                 return;
 
-            _glfwInputTouch(window, id, GLFW_RELEASE, 0., 0.);
-            _glfw.wl.touchFocuses[i] = NULL;
-            _glfw.wl.touchIDs[i] = -1;
+            xpos = _glfw.wl.touchIDs[i].last_xpos;
+            ypos = _glfw.wl.touchIDs[i].last_ypos;
+            _glfwInputTouch(window, id, GLFW_RELEASE, xpos, ypos);
+            _glfw.wl.touchIDs[i].focus = NULL;
+            _glfw.wl.touchIDs[i].id = -1;
             return;
         }
     }
@@ -1988,13 +1985,15 @@ static void touchHandleMotion(void* data,
 
     for (i = 0; i < _glfw.wl.touchSize; ++i)
     {
-        if (_glfw.wl.touchIDs[i] == id)
+        if (_glfw.wl.touchIDs[i].id == id)
         {
-            _GLFWwindow* window = _glfw.wl.touchFocuses[i];
+            _GLFWwindow* window = _glfw.wl.touchIDs[i].focus;
 
             if (!window)
                 return;
 
+            _glfw.wl.touchIDs[i].last_xpos = xpos;
+            _glfw.wl.touchIDs[i].last_ypos = ypos;
             _glfwInputTouch(window, id, GLFW_MOVE, xpos, ypos);
             return;
         }
@@ -2016,15 +2015,15 @@ static void touchHandleCancel(void* data,
 
     for (i = 0; i < _glfw.wl.touchSize; ++i)
     {
-        if (_glfw.wl.touchIDs[i] < 0)
+        if (_glfw.wl.touchIDs[i].id < 0)
             continue;
 
-        int id = _glfw.wl.touchIDs[i];
-        _GLFWwindow* window = _glfw.wl.touchFocuses[i];
+        int id = _glfw.wl.touchIDs[i].id;
+        _GLFWwindow* window = _glfw.wl.touchIDs[i].focus;
 
         _glfwInputTouch(window, id, GLFW_RELEASE, 0., 0.);
-        _glfw.wl.touchFocuses[i] = NULL;
-        _glfw.wl.touchIDs[i] = -1;
+        _glfw.wl.touchIDs[i].focus = NULL;
+        _glfw.wl.touchIDs[i].id = -1;
     }
 }
 

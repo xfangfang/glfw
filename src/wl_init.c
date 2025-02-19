@@ -875,12 +875,13 @@ int _glfwInitWayland(void)
         return GLFW_FALSE;
     }
 
-    _glfw.wl.touchFocuses = _glfw_calloc(4, sizeof(_GLFWwindow*));
-    _glfw.wl.touchIDs = _glfw_calloc(4, sizeof(int));
     _glfw.wl.touchSize = 4;
+    _glfw.wl.touchIDs = _glfw_calloc(_glfw.wl.touchSize, sizeof(_GLFWtouchIdWayland));
+    if (!_glfw.wl.touchIDs)
+        return GLFW_FALSE;
 
     for (int i = 0; i < _glfw.wl.touchSize; ++i)
-        _glfw.wl.touchIDs[i] = -1;
+        _glfw.wl.touchIDs[i].id = -1;
 
     if (!loadCursorTheme())
         return GLFW_FALSE;
@@ -937,8 +938,6 @@ void _glfwTerminateWayland(void)
         _glfw.wl.xkb.handle = NULL;
     }
 
-    if (_glfw.wl.touchFocuses)
-        _glfw_free(_glfw.wl.touchFocuses);
     if (_glfw.wl.touchIDs)
         _glfw_free(_glfw.wl.touchIDs);
 
